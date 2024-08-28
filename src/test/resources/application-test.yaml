@@ -1,0 +1,137 @@
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+#Metrics related configurations
+management.endpoint.metrics.enabled: "true"
+management.endpoints.web.exposure.include: "*"
+management.endpoint.prometheus.enabled: "true"
+management.metrics.export.prometheus.enabled: "true"
+management.metrics.web.server.auto-time-requests: "true"
+management.info.env.enabled: "true"
+
+#opentracing.jaeger.enabled: "true"
+
+endpoints.health.sensitive: "false"
+info.app.name: '@name@'
+info.app.description: Microservice chassis app
+info.app.version: '@version@'
+info.app.legal: "COPYRIGHT Ericsson 2021 -
+ The copyright to the computer program(s) herein is the property of
+ Ericsson Inc. The programs may be used and/or copied only with written
+ permission from Ericsson Inc. or in accordance with the terms and
+ conditions stipulated in the agreement/contract under which the
+ program(s) have been supplied."
+
+#See more details about pattern layout: https://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html
+#See more details about logging.pattern.level : https://docs.spring.io/spring-boot/docs/2.5.2/reference/html/features.html#features.logging.custom-log-configuration
+#logging.pattern.level: "%5p [%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}][%X{userName}]"
+
+#Set the stubrunner credentials:
+#stubrunner.username: <LAN SIGNUM ID>
+#stubrunner.password: <LAN encripted PWD or JFrog API Key>
+stubrunner.username: ${SELI_ARTIFACTORY_REPO_USER}
+stubrunner.password: ${SELI_ARTIFACTORY_REPO_PASS}
+
+spring:
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+  datasource:
+    url: jdbc:h2:mem:testdb;INIT=CREATE SCHEMA IF NOT EXISTS acm_schema
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  flyway:
+    url: jdbc:h2:mem:testdb
+    user: postgres
+    password: postgres
+    baseline-on-migrate: true
+    enabled: false
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  application:
+    name: app-onboarding
+  cloud:
+    discovery:
+      enabled: false
+  main:
+    allow-bean-definition-overriding: true
+
+HELM_REG_URL: http://localhost:54321/v1/apps/helm
+HELM_REG_USER: admin
+HELM_REG_PASSWORD: password
+TMP_DIR: "."
+
+CONT_REG_URL: http://localhost:5000/v1/apps/registry
+CONT_REG_USER: admin
+CONT_REG_PASSWORD: password
+
+deployment:
+  cron:
+    fetchRate: 2000
+    initialDelay: 0
+  dataCleanup:
+    schedule:
+      fixedRate: 2000
+      initialDelay: 1000
+      hangingJobAgeMinutes: 1
+  docker:
+    pythonJobImageName: "armdocker.rnd.ericsson.se/proj-eric-oss-drop/eric-oss-app-onboarding/python-job-image:1.2.51"
+  kubernetes:
+    activeDeadlineSeconds: 900
+    ttlSecondsAfterFinished: 300
+  instanceName: "eric-oss-app-onboarding-0"
+  serviceMeshEnabled: true
+  tlsEnabled: true
+  serviceMeshUserVolume: "{\"eric-oss-app-onboarding-helm-chart-reg-certs-tls\":{\"secret\":{\"secretName\":\"eric-oss-app-onboarding-eric-lcm-helm-chart-registry-secret\",\"optional\":true}},\"eric-oss-app-onboarding-certs-ca-tls\":{\"secret\":{\"secretName\":\"eric-sec-sip-tls-trusted-root-cert\"}},\"eric-oss-app-onboarding-eric-lcm-container-registry-tls\":{\"secret\":{\"secretName\":\"eric-oss-app-onboarding-eric-lcm-container-registry-secret\",\"optional\":true}}}"
+  serviceMeshVolumeMount: "{\"eric-oss-app-onboarding-helm-chart-reg-certs-tls\":{\"mountPath\":\"/etc/istio/tls/eric-lcm-helm-chart-registry\",\"readOnly\":true},\"eric-oss-app-onboarding-certs-ca-tls\":{\"mountPath\":\"/etc/istio/tls-ca\",\"readOnly\":true},\"eric-oss-app-onboarding-eric-lcm-container-registry-tls\":{\"mountPath\":\"/etc/istio/tls/eric-lcm-container-registry\",\"readOnly\":true}}"
+
+artifactRegistryRetry:
+  delay: 1000
+  maxAttempts: 3
+
+# When running unit tests on jenkins server we need to ruse the /tmp dir on the filesystem as the location to upload and process the pkg
+onboarding-job:
+  tempFolderLocation: /tmp
+
+object-store:
+  hostname: localhost
+  port: 9000
+  credentials:
+    username: objectStore
+    password: pwd
+  bucketName: app-management
+  bucketCheckRetry:
+    delay: 500
+    maxAttempts: 6
+
+dataAccessRetry:
+  delay: 500
+  maxAttempts: 6
+
+lcmServiceRetry:
+  delay: 500
+  maxAttempts: 3
+

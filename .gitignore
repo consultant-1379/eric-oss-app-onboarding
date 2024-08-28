@@ -1,0 +1,28 @@
+# Maven #
+*target/
+target/**
+
+#BOB
+.bob
+#WSL
+$HOME
+
+**.openapi-generator**
+
+# IntelliJ #
+*.iml
+*.idea/
+*.idea/*
+
+env/
+env/**
+
+**/eric-oss-app-onboarding-openapi.yaml.sha256
+eric-oss-app-onboarding.ipr
+eric-oss-app-onboarding.iws
+etc/python-job-image-coverage-report.xml
+etc/python-job-image/.coverage
+etc/python-job-image/__pycache__/
+etc/python-job-image/tests/__pycache__/
+etc/python-job-image/__pycache__/**
+etc/python-job-image/tests/__pycache__/**

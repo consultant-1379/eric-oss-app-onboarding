@@ -1,0 +1,54 @@
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+productName: "eric-oss-app-onboarding HELM"
+productNumber: "CXD 101 363"
+images:
+  eric-oss-app-onboarding:
+    productName: "eric-oss-app-onboarding IMAGE"
+    productNumber: "CXU 101 1593"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "eric-oss-app-onboarding"
+    tag: "VERSION"
+  python-job-image:
+    productName: "Python Job Image"
+    productNumber: "CXC 000 0000"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH/eric-oss-app-onboarding"
+    name: "python-job-image"
+    tag: "VERSION"
+  eric-oss-app-onboardingTest:
+    productName: "eric-oss-app-onboarding Test IMAGE"
+    productNumber: "CXC 201 0002"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "proj-eric-oss-drop"
+    name: "eric-oss-helm-test"
+    tag: "1.0.0-1"
+  hooklauncher:
+    productName: "eric-oss-app-onboarding hooklauncher"
+    productNumber: "CXC 000 0000"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "eric-oss-app-onboarding-hooklauncher"
+    tag: "VERSION"
+  kubeclient:
+    productName: "Document Database Kube-Client Image"
+    productNumber: "CXC 201 1992"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "proj-document-database-pg-release/data"
+    name: "eric-data-document-database-kube-client"
+    tag: "9.2.0-44"

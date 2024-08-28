@@ -1,0 +1,458 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: v1
+data:
+  application.properties: |
+    management.endpoint.metrics.enabled=true
+    management.endpoints.web.exposure.include=*
+    management.endpoint.prometheus.enabled=true
+    management.metrics.export.prometheus.enabled=true
+    management.metrics.web.server.auto-time-requests=true
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-oss-app-onboarding.name" . }}-configmap
+  labels:
+  {{ include "eric-oss-app-onboarding.labels" . | nindent 4 }}
+  annotations:
+  {{ include "eric-oss-app-onboarding.annotations" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "eric-oss-app-onboarding.fullname" . }}
+  labels:
+  {{- include "eric-oss-app-onboarding.labels" . | nindent 4 }}
+  annotations:
+  {{- include "eric-oss-app-onboarding.annotations" . | nindent 4 }}
+spec:
+{{ if not .Values.autoScaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{ end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "eric-oss-app-onboarding.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  serviceName: {{ include "eric-oss-app-onboarding.fullname" . }}
+  updateStrategy:
+    type: {{ .Values.updateStrategy.type | quote }}
+  template:
+    metadata:
+      labels:
+{{- $commonLabels :=  include "eric-oss-app-onboarding.labels" . | fromYaml }}
+{{- $directStreaming := include "eric-oss-app-onboarding.directStreamingLabel" . | fromYaml }}
+{{- $serviceMesh := include "eric-oss-app-onboarding.service-mesh-inject" . | fromYaml }}
+{{- $dstLabels := include "eric-oss-app-onboarding.dstLabels" . | fromYaml }}
+{{- include "eric-oss-app-onboarding.service-mesh-ism2osm-labels" . | nindent 8 }}
+{{- include "eric-oss-app-onboarding.mergeLabels" (dict "location" .Template.Name "sources" (list $commonLabels $serviceMesh $directStreaming $dstLabels)) | trim | nindent 8 }}
+      annotations:
+{{- $commonAnnotations := include "eric-oss-app-onboarding.annotations-without-prometheus" . | fromYaml }}
+{{- $serviceMesh := include "eric-oss-app-onboarding.service-mesh-inject" . | fromYaml }}
+{{- $istioProxyConfig := include "eric-oss-app-onboarding.istio-proxy-config-annotation" .| fromYaml }}
+{{- $serviceMeshVersion := include "eric-oss-app-onboarding.service-mesh-version" . | fromYaml }}
+{{- include "eric-oss-app-onboarding.service-mesh-volume" .| nindent 8 }}
+{{- include "eric-oss-app-onboarding.mergeAnnotations" (dict "location" .Template.Name "sources" (list $commonAnnotations $serviceMesh $istioProxyConfig $serviceMeshVersion)) | trim | nindent 8 }}
+{{- if eq "true" (include "eric-oss-app-onboarding.log-streaming-activated" .) }}
+{{- include "eric-log-shipper-sidecar.LsAppArmorProfileAnnotation" . | indent 8 }}
+{{- end }}
+    spec:
+      {{ $dbConfig := index .Values "eric-data-document-db" }}
+      {{- if (index .Values "podPriority" "eric-oss-app-onboarding" "priorityClassName") }}
+      priorityClassName: {{index .Values "podPriority" "eric-oss-app-onboarding" "priorityClassName" | quote}}
+      {{- end }}
+      {{- if include "eric-oss-app-onboarding.pullSecret" . }}
+      imagePullSecrets:
+        - name: {{ include "eric-oss-app-onboarding.pullSecret" . | quote }}
+      {{- end }}
+      serviceAccountName: {{ template "eric-oss-app-onboarding.fullname" . }}-sa
+      securityContext:
+        fsGroup: {{ include "eric-oss-app-onboarding.fsGroup.coordinated" . }}
+        {{- if include "eric-oss-app-onboarding.podSecurityContext.supplementalGroups" . }}
+        supplementalGroups: {{ include "eric-oss-app-onboarding.podSecurityContext.supplementalGroups" . }}
+        {{- end }}
+      containers:
+        {{- if eq "true" (include "eric-oss-app-onboarding.log-streaming-activated" .) }}
+        {{- include "eric-oss-app-onboarding.log-shipper-sidecar-container" . | indent 8 }}
+        {{- end }}
+        - name: eric-oss-app-onboarding
+          image: {{ template "eric-oss-app-onboarding.mainImagePath" . }}
+          imagePullPolicy: {{ include "eric-oss-app-onboarding.imagePullPolicy" . | quote}}
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop:
+                - all
+            privileged: true
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          volumeMounts:
+            {{- if eq "true" (include "eric-oss-app-onboarding.log-streaming-activated" .) }}
+            {{- include "eric-log-shipper-sidecar.log-shipper-sidecar-mounts" . | indent 12 }}
+            {{- end }}
+            - name: config-volume
+              mountPath: /config
+            - name: storage-volume
+              mountPath: /tmp
+            - name: temp-volume
+              mountPath: /temp
+            - name: log-control-config
+              mountPath: /logcontrol
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: {{ index .Values "probes" "eric-oss-app-onboarding" "livenessProbe" "initialDelaySeconds" }}
+            periodSeconds: {{ index .Values "probes" "eric-oss-app-onboarding" "livenessProbe" "periodSeconds" }}
+            timeoutSeconds: {{ index .Values "probes" "eric-oss-app-onboarding" "livenessProbe" "timeoutSeconds" }}
+            failureThreshold: {{ index .Values "probes" "eric-oss-app-onboarding" "livenessProbe" "failureThreshold" }}
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+          readinessProbe:
+            initialDelaySeconds: {{ index .Values "probes" "eric-oss-app-onboarding" "readinessProbe" "initialDelaySeconds" }}
+            periodSeconds: {{ index .Values "probes" "eric-oss-app-onboarding" "readinessProbe" "periodSeconds" }}
+            timeoutSeconds: {{ index .Values "probes" "eric-oss-app-onboarding" "readinessProbe" "timeoutSeconds" }}
+            failureThreshold: {{ index .Values "probes" "eric-oss-app-onboarding" "readinessProbe" "failureThreshold" }}
+            httpGet:
+              path: /actuator/health
+              port: http
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "/bin/sh", "-c",
+                    " date '+[%c] Waiting for main container termination' >> /dev/termination-log;
+                            sleep 30s" ]
+          env:
+          - name: SERVICE_ID
+            value: {{ .Chart.Name }}
+          - name: PAYLOAD_USERNAME_KEY
+            value: preferred_username
+          - name: PYTHON_JOB_IMAGE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "eric-oss-app-onboarding.fullname" . }}-python-image-configmap
+                key: image
+          - name: ACTIVE_DEADLINE_SECONDS
+            value: {{ .Values.pythonJob.activeDeadlineSeconds | quote }}
+          - name: TTL_SECONDS_AFTER_FINISHED
+            value: {{ .Values.pythonJob.ttlSecondsAfterFinished | quote }}
+          - name: PYTHON_JOB_POLLING_TIME
+            value: {{ .Values.pythonJob.pythonJobPollingTime | quote }}
+          - name: CRON_FETCH_RATE
+            value: {{ .Values.cron.fetchRate | quote }}
+          - name: DATA_CLEANUP_FIXED_RATE
+            value: {{ .Values.dataCleanup.schedule.fixedRate | quote }}
+          - name: TZ
+            value: {{ template "eric-oss-app-onboarding.timezone" . }}
+          - name: TMP_DIR
+            value: {{ .Values.helmReg.tmpDir }}
+          - name: CONT_REG_URL
+            value: {{ .Values.contReg.url }}
+          - name: CONT_REG_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{.Values.contReg.secret}}
+                key: name
+          - name: CONT_REG_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{.Values.contReg.secret}}
+                key: password
+          - name: HELM_REG_URL
+            value: {{ .Values.helmReg.url }}
+          - name: HELM_REG_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.helmReg.secret }}
+                key: BASIC_AUTH_USER
+          - name: HELM_REG_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.helmReg.secret }}
+                key: BASIC_AUTH_PASS
+          - name: OBJECT_STORE_HOSTNAME
+            value: {{ .Values.objectStore.hostname | quote }}
+          - name: OBJECT_STORE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "eric-oss-app-onboarding.secret-key-reference" . }}
+                key: accesskey
+                optional: true
+          - name: OBJECT_STORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "eric-oss-app-onboarding.secret-key-reference" . }}
+                key: secretkey
+                optional: true
+          - name: OBJECT_STORE_BUCKET
+            value: {{ .Values.objectStore.bucketName | quote }}
+          - name: OBJECT_STORE_BUCKET_CHECK_DELAY
+            value: {{ .Values.objectStore.bucketCheckRetry.delay | quote }}
+          - name: OBJECT_STORE_BUCKET_CHECK_MAX_ATTEMPTS
+            value: {{ .Values.objectStore.bucketCheckRetry.maxAttempts | quote }}
+          - name: INSTANCE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: DB_HOST
+            value: {{ $dbConfig.name }}
+          - name: DB_PORT
+            value: {{ $dbConfig.port | quote }}
+          - name: DB_NAME
+            value: {{ $dbConfig.onboardingPgDatabase }}
+          - name: DB_DRIVER
+            value: {{ $dbConfig.driver }}
+          - name: ONBOARDING_JOBS_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ $dbConfig.credentials.kubernetesSecretName }}
+                key: custom-user
+          - name: ONBOARDING_JOBS_DB_USER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ $dbConfig.credentials.kubernetesSecretName }}
+                key: custom-pwd
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: APP_MANAGER_APP_ONBOARDING_ROUTE_PATH
+            value: {{ index .Values "api-gateway-route" "eric-oss-app-onboarding" "path" | quote }}
+          - name: APP_MANAGER_APP_LCM_ROUTE_PATH
+            value: {{ index .Values "api-gateway-route" "eric-oss-app-lcm" "path" | quote }}
+          - name: APP_LCM_SERVICE_HOSTNAME
+            value: {{ index .Values "app-lcm" "service" "hostname" | quote }}
+          - name: APP_LCM_SERVICE_PORT
+            value: {{ index .Values "app-lcm" "service" "port" | quote }}
+          - name: RETRY_DELAY_MS
+            value: {{ .Values.artifactRegistryRetry.delay | quote }}
+          - name: RETRY_MAX_ATTEMPTS
+            value: {{ .Values.artifactRegistryRetry.maxAttempts | quote }}
+          - name: DATA_ACCESS_RETRY_DELAY_MS
+            value: {{ .Values.dataAccessRetry.delay | quote }}
+          - name: DATA_ACCESS_RETRY_MAX_ATTEMPTS
+            value: {{ .Values.dataAccessRetry.maxAttempts | quote }}
+          - name: APP_EXECUTOR_THREADS_COUNT
+            value: {{ .Values.appPackageExecutor.threadsCount | quote }}
+          - name: SERVICE_MESH_ENABLED
+            value: {{ include "eric-oss-app-onboarding.service-mesh-enabled" . | quote }}
+          - name: TLS_ENABLED
+            value: {{ include "eric-oss-app-onboarding.global-security-tls-enabled" . | quote }}
+          - name: SM_USER_VOLUME
+            value: {{ .Values.serviceMesh.userVolume | toJson }}
+          - name: SM_USER_VOLUME_MOUNT
+            value: {{ .Values.serviceMesh.userVolumeMount | toJson }}
+      {{- if .Values.global }}
+        {{- if .Values.global.security }}
+          {{- if .Values.global.security.tls }}
+            {{- if .Values.global.security.tls.enabled }}
+          - name: CONNECT_MODE
+            value: "tls"
+            {{- if (eq .Values.service.endpoints.chassisapi.tls.enforced "required") }}
+          - name: TLS_MODE
+            value: "only_tls"
+            {{- if (eq .Values.service.endpoints.chassisapi.tls.verifyClientCertificate "required") }}
+          - name: TLS_CA
+            value: "ca_path"
+            {{- end }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- include "eric-oss-app-onboarding.dstEnv" . | indent 10 }}
+      {{- include "eric-oss-app-onboarding.loggingEnv" . | indent 10 }}
+          resources:
+            requests:
+            {{- if (index .Values "resources" "eric-oss-app-onboarding" "requests" "cpu") }}
+              cpu: {{ (index .Values "resources" "eric-oss-app-onboarding" "requests" "cpu" | quote) }}
+            {{- end }}
+            {{- if (index .Values "resources" "eric-oss-app-onboarding" "requests" "memory") }}
+              memory: {{ (index .Values "resources" "eric-oss-app-onboarding" "requests" "memory" | quote) }}
+            {{- end }}
+            {{- if (index .Values "resources" "eric-oss-app-onboarding" "requests" "ephemeral-storage") }}
+            {{ println "  ephemeral-storage:" (index .Values "resources" "eric-oss-app-onboarding" "requests" "ephemeral-storage" | quote) }}
+            {{- end }}
+            limits:
+            {{- if (index .Values "resources" "eric-oss-app-onboarding" "limits" "cpu") }}
+              cpu: {{ (index .Values "resources" "eric-oss-app-onboarding" "limits" "cpu" | quote) }}
+            {{- end }}
+            {{- if (index .Values "resources" "eric-oss-app-onboarding" "limits" "memory") }}
+              memory: {{ (index .Values "resources" "eric-oss-app-onboarding" "limits" "memory" | quote) }}
+            {{- end }}
+            {{- if (index .Values "resources" "eric-oss-app-onboarding" "limits" "ephemeral-storage") }}
+            {{ println "  ephemeral-storage:" (index .Values "resources" "eric-oss-app-onboarding" "limits" "ephemeral-storage" | quote) }}
+            {{- end }}
+      nodeSelector: {{ include "eric-oss-app-onboarding.nodeSelector" . | nindent 6 -}}
+      {{- if ne (len (include "eric-oss-app-onboarding.tolerations" .)) 0 }}
+      tolerations:
+        {{- include "eric-oss-app-onboarding.tolerations" . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- if eq .Values.affinity.podAntiAffinity "hard" }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ include "eric-oss-app-onboarding.name" . }}
+              topologyKey: {{ .Values.affinity.topologyKey | quote }}
+      {{- else if eq .Values.affinity.podAntiAffinity  "soft" }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - {{ include "eric-oss-app-onboarding.name" . }}
+                topologyKey: {{ .Values.affinity.topologyKey | quote }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      initContainers:
+        - name: create-db-schema
+          image: {{ template "eric-oss-app-onboarding.kubeclientImage" . }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/scripts/init-db.sh"
+          resources:
+            limits:
+              cpu: {{ .Values.resources.initdb.limits.cpu | quote }}
+              memory: {{ .Values.resources.initdb.limits.memory | quote }}
+            {{- if index $.Values.resources.initdb.limits "ephemeral-storage" }}
+              ephemeral-storage: {{ index .Values.resources.initdb.limits "ephemeral-storage" | quote }}
+            {{- end }}
+            requests:
+              cpu: {{ .Values.resources.initdb.requests.cpu | quote }}
+              memory: {{ .Values.resources.initdb.requests.memory | quote }}
+            {{- if index $.Values.resources.initdb.requests "ephemeral-storage" }}
+              ephemeral-storage: {{ index .Values.resources.initdb.requests "ephemeral-storage" | quote }}
+            {{- end }}
+          env:
+            - name: PGHOST
+              value: {{ $dbConfig.name | quote }}
+            - name: PGPORT
+              value: {{ $dbConfig.port | quote }}
+            - name: APPONBOARDINGPGDATABASE
+              value: {{ $dbConfig.onboardingPgDatabase | quote }}
+            - name: STARTUP_WAIT
+              value: "10"
+            - name: TZ
+              value: {{ template "eric-oss-app-onboarding.timezone" . }}
+            - name: ONBOARDING_JOBS_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $dbConfig.credentials.kubernetesSecretName }}
+                  key: custom-user
+          {{- if (eq (include "eric-oss-app-onboarding.global-security-tls-enabled" .) "true") }}
+            - name: PGSSLMODE
+              value: verify-full
+            - name: PGSSLCERT
+              value: /opt/mtls/cert/clicert.pem
+            - name: PGSSLKEY
+              value: /opt/mtls/cert/cliprivkey.pem
+            - name: PGSSLROOTCERT
+              value: /opt/mtls/ca/cacertbundle.pem
+            - name: PGUSER
+              value: postgres
+          {{- else }}
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $dbConfig.credentials.kubernetesSecretName }}
+                  key: super-user
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $dbConfig.credentials.kubernetesSecretName }}
+                  key: super-pwd
+          {{- end }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+          {{- if (eq (include "eric-oss-app-onboarding.global-security-tls-enabled" .) "true") }}
+            - name: init-cert
+              mountPath: /opt/mtls/cert
+              readOnly: true
+            - name: init-sip-tls-ca
+              mountPath: /opt/mtls/ca
+              readOnly: true
+          {{- end }}
+      volumes:
+        {{- if eq "true" (include "eric-oss-app-onboarding.log-streaming-activated" .) }}
+        {{- include "eric-oss-app-onboarding.log-shipper-sidecar-volume" . | indent 8 }}
+        {{- end }}
+        - name: config-volume
+          configMap:
+            name: eric-oss-app-onboarding-configmap
+        - name: tmp-volume
+          emptyDir: { }
+        - name: temp-volume
+          emptyDir: { }
+        - name: log-control-config
+          configMap:
+              name: {{ include "eric-oss-app-onboarding.name" . }}-log-config
+        - name: scripts
+          configMap:
+            name: {{ template "eric-oss-app-onboarding.name" . }}-init-db-script
+            defaultMode: 0777
+        {{- if (eq (include "eric-oss-app-onboarding.global-security-tls-enabled" .) "true") }}
+        - name: init-sip-tls-ca
+          secret:
+            secretName: eric-sec-sip-tls-trusted-root-cert
+            defaultMode: 0440
+        - name: init-cert
+          secret:
+            secretName: {{ $dbConfig.name }}-postgres-cert
+            defaultMode: 0440
+        {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "eric-oss-app-onboarding.name" . }}
+        app.kubernetes.io/version: {{ include "eric-oss-app-onboarding.version" . }}
+      name: storage-volume
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      volumeMode: {{ .Values.persistence.persistentVolumeClaim.storageConnectivity }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.persistentVolumeClaim.size }}
+  {{- if eq "true" (include "eric-oss-app-onboarding.log-streaming-activated" .) }}
+  - metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "eric-oss-app-onboarding.name" . }}
+        app.kubernetes.io/version: {{ include "eric-oss-app-onboarding.version" . }}
+      name: eric-log-shipper-sidecar-storage-path
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      volumeMode: {{ .Values.logShipperPersistence.persistentVolumeClaim.storageConnectivity }}
+      resources:
+        requests:
+          storage: {{ .Values.logShipperPersistence.persistentVolumeClaim.size }}
+  {{- end }}

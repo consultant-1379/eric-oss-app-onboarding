@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "id": "26471a81-1de4-4ad9-9724-326eefd22230",
+      "type": "rApp",
+      "name": "App-Onboarding-helloWorld",
+      "version": "1.0.0",
+      "mode": "DISABLED",
+      "status": "CREATED",
+      "createdTimestamp": "2023-04-06T00:04:16.711+00:00"
+    }
+  ]
+}

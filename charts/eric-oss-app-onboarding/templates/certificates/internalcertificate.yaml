@@ -1,0 +1,53 @@
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{- if .Values.global }}
+  {{- if .Values.global.security }}
+    {{- if .Values.global.security.tls }}
+      {{- if .Values.global.security.tls.enabled }}
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  name: {{ template "eric-oss-app-onboarding.name" . }}-internal-cert
+  labels:
+{{ include "eric-oss-app-onboarding.labels" . | indent 4 }}
+{{- if .Values.labels }}
+{{ .Values.labels | toYaml | indent 4 }}
+{{- end }}
+  annotations:
+{{- include "eric-oss-app-onboarding.product-info" . | indent 4 }}
+{{- include "eric-oss-app-onboarding.prometheus" . | nindent 4 }}
+{{- include "eric-oss-app-onboarding.config-annotations" . | indent 4 }}
+{{- if .Values.annotations }}
+{{- toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+spec:
+  kubernetes:
+    generatedSecretName: {{ template "eric-oss-app-onboarding.name" . }}-secret
+    certificateName: clientCert.pem
+    privateKeyName: clientPrivateKey.pem
+  certificate:
+    subject:
+      cn: {{ template "eric-oss-app-onboarding.name" . }}
+    issuer:
+      reference: eric-data-message-bus-kf-client-client-ca
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

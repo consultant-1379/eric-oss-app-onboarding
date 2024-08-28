@@ -1,0 +1,78 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+
+{{- $helmHook := dict -}}
+{{- $_ := set $helmHook "helm.sh/hook" "pre-upgrade,pre-rollback" -}}
+{{- $_ := set $helmHook "helm.sh/hook-delete-policy" "before-hook-creation" -}}
+{{- $_ := set $helmHook "helm.sh/hook-weight" "-202" -}}
+{{- $commonAnn := fromYaml (include "eric-oss-app-onboarding.annotations-rbac" .) -}}
+{{- $commonLabels := fromYaml (include "eric-oss-app-onboarding.labels" .) -}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eric-oss-app-onboarding.name" . }}-hooklauncher-role
+  labels:
+{{ $commonLabels | toYaml | indent 4}}
+  annotations:
+{{ $commonAnn | toYaml | indent 4}}
+rules:
+  - apiGroups:
+    - "apps"
+    resources:
+    - statefulsets
+    verbs:
+    - delete
+    - get
+  - apiGroups:
+      - "apps"
+    resources:
+      - statefulsets/scale
+    verbs:
+      - patch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "eric-oss-app-onboarding.name" . }}-hooklauncher-rolebinding
+  labels:
+{{ $commonLabels | toYaml | indent 4}}
+  annotations:
+{{ $commonAnn | toYaml | indent 4}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "eric-oss-app-onboarding.name" . }}-hooklauncher-role
+subjects:
+  - namespace: {{ .Release.Namespace }}
+    kind: ServiceAccount
+    name: {{ include "eric-oss-app-onboarding.name" . }}-hooklauncher-sa
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "eric-oss-app-onboarding.name" . }}-hooklauncher-sa
+  labels:
+{{ $commonLabels | toYaml | indent 4}}
+  annotations:
+{{ $commonAnn | toYaml | indent 4}}
+{{- if include "eric-oss-app-onboarding.pullSecret" . }}
+imagePullSecrets:
+  - name: {{ include "eric-oss-app-onboarding.pullSecret" . | quote }}
+{{- end }}

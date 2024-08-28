@@ -1,0 +1,6 @@
+[submodule "bob"]
+	path = bob
+	url = ../../../adp-cicd/bob
+[submodule "smart-helm-hooks"]
+	path = smart-helm-hooks
+	url = ../../../adp-flex-teams/smart-helm-hooks

@@ -1,0 +1,800 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+openapi: "3.0.2"
+info:
+  x-api-id: 58e4347d-6a0f-48ac-83d1-e47f137312fa
+  x-audience: external-public
+  description: |
+    App Onboarding API  
+    The endpoints in this API are deprecated. For more information on the latest App Administration APIs, please refer 
+    to the App Onboarding API V2 and App Lifecycle Management API V3.
+  version: "1.1.0"
+  title: "App Onboarding to store and retrieve apps"
+  license:
+    name: "COPYRIGHT Ericsson 2022"
+    url: "https://www.ericsson.com/en/legal"
+  termsOfService: "https://www.ericsson.com/en/legal"
+  contact:
+    name: "Team Rhapsody"
+    email: "PDLTEAMRHA@pdl.internal.ericsson.com"
+tags:
+  - name: "onboarding"
+    description: "Tags for api onboarding"
+paths:
+  /v1/apps:
+    get:
+      summary: Lists all the apps onboarded
+      deprecated: true
+      description:  |
+        User must be authorized to use this endpoint. User must have App Manager Admin or Operator role.  
+        This endpoint is deprecated and is replaced by 'app-lifecycle-management/v3/apps'.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "getAllApps"
+      parameters:
+        - name: q
+          in: query
+          description: Get Apps Filtered using query parameter (name, vendor, version, id)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByName:
+              summary: Example of Query By Name
+              value: q=name:eric-oss-app-mgr
+            queryByVendor:
+              summary: Example of Query By Vendor
+              value: q=vendor:Ericsson
+            queryByVersion:
+              summary: Example of Query By Version
+              value: q=version:1.1.10
+            queryById:
+              summary: Example of Query By ID
+              value: q=id:1
+        - name: sort
+          in: query
+          description: Get Apps Sorted By (name, vendor, version, id)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            sortByName:
+              summary: Example of Sort By Name
+              value: sort=name
+            sortByVendor:
+              summary: Example of Sort By Vendor
+              value: sort=vendor
+            sortByVersion:
+              summary: Example of Sort By Version
+              value: sort=version
+            sortByID:
+              summary: Example of Sort By ID
+              value: sort=id
+        - name: offset
+          in: query
+          description: Get Apps Filter by Offset
+          required: false
+          style: form
+          explode: true
+          schema:
+            minimum: 0
+            type: integer
+            default: 0
+          examples:
+            offsetExample:
+              summary: Example of Offset
+              value: offset=1
+        - name: limit
+          in: query
+          description: Get Apps Filter by Limit
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+          examples:
+            pageLimitExample:
+              summary: Example of Limit
+              value: limit=100
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getFilterBadRequest'
+    post:
+      summary: Onboards the provided app csar package
+      deprecated: true
+      description:  |
+        User must be authorized to use this endpoint. User must have App Manager Admin role.  
+        This endpoint is deprecated and is replaced by 'app-onboarding/v2/app-packages'.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "onboardingApps"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/appsOnboarding'
+        required: true
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+                example: v1/apps/103
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/uploadAccepted'
+          links:
+            GetAppByAppId:
+              operationId: "getAppById"
+              parameters:
+                appId: '$response.body#/appId'
+              description: >
+                The appId value returned in the response can be used as
+                the appId parameter in GET /v1/apps/{appId}.
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/uploadBadRequest'
+
+  /v1/apps/{appId}:
+    get:
+      summary: Get app details for given app id
+      deprecated: true
+      description:  |
+        User must be authorized to use this endpoint. User must have App Manager Admin or Operator role.  
+        This endpoint is deprecated and is replaced by 'app-lifecycle-management/v3/apps/{appId}'.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "getAppById"
+      parameters:
+        - name: appId
+          in: path
+          description: The id of the app to be retrieved
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appBadRequest'
+    put:
+      summary: Update app for a given app id
+      deprecated: true
+      description:  |
+        User must be authorized to use this endpoint. User must have App Manager Admin role.  
+        This endpoint is deprecated and is replaced by 'app-lifecycle-management/v3/apps/{appId}/mode' to enable/disable the App.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "updateApp"
+      parameters:
+        - name: appId
+          in: path
+          description: The id of the app to be updated
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/appOnboardingPutRequestDto'
+            examples:
+              AppInstance:
+                $ref: '#/components/examples/appOnboardingPutRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appInvalidPutRequest'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appIdNotFoundRequest'
+    delete:
+      summary: Delete app for a given app id
+      deprecated: true
+      description:  |
+        Only App LCM is authorized to use this endpoint.  
+        This endpoint is deprecated and is replaced by 'app-lifecycle-management/v3/apps/{appId}'.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "deleteApp"
+      parameters:
+        - name: appId
+          in: path
+          description: The id of the app to be deleted
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appInvalidDeleteRequest'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedRequest'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appIdNotFoundDeleteRequest'
+        "406":
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notAcceptable'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conflictRequest'
+        "429":
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tooManyRequest'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internalServerError'
+
+  /v1/apps/{appId}/artifacts:
+    get:
+      summary: Lists details of the artifacts in the app related to this name
+      deprecated: true
+      description:  |
+        User must be authorized to use this endpoint. User must have App Manager Admin or Operator role.  
+        This endpoint is deprecated and is replaced by 'app-lifecycle-management/v3/apps'.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "getAppArtifactsById"
+      parameters:
+        - name: appId
+          in: path
+          description: The app with the id specified will be retrieved
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/artifacts'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artifactsBadRequest'
+
+  /v1/apps/{appId}/artifacts/{artifactId}:
+    get:
+      summary: Get app artifact details for given id
+      deprecated: true
+      description:  |
+        User must be authorized to use this endpoint. User must have App Manager Admin or Operator role.  
+        This endpoint is deprecated and will be removed in a future release.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "getAppArtifactsByArtifactId"
+      parameters:
+        - name: appId
+          in: path
+          description: The app with the id specified will be retrieved
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+        - name: artifactId
+          in: path
+          description: The artifact in the app with the id specified will be retrieved
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artifacts'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artifactsBadRequest'
+
+  /v1/apps/{appId}/artifacts/{artifactId}/file:
+    get:
+      summary: Get app artifact file for given id
+      deprecated: true
+      description:  |
+        User must be authorized to use this endpoint. User must have App Manager Admin or Operator role.  
+        This endpoint is deprecated and will be removed in a future release.  
+        For more information on the latest App Administration APIs, please refer to the App Onboarding API V2 and App Lifecycle Management API V3.
+      tags:
+        - onboarding
+      operationId: "getAppArtifactsFileByArtifactId"
+      parameters:
+        - name: appId
+          in: path
+          description: The app with the id specified will be retrieved
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+        - name: artifactId
+          in: path
+          description: The artifact in the app with the id specified will be retrieved
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artifactFile'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artifactFileBadRequest'
+components:
+  schemas:
+    app:
+      type: object
+      properties:
+        appId:
+          type: integer
+          example: 1
+        appName:
+          type: string
+          example: common-1.22.20
+        username:
+          type: string
+          example: David
+        appVersion:
+          type: string
+          example: 6.1.0+66
+        appSize:
+          type: string
+          example: 369 KB
+        vendor:
+          type: string
+          example: Ericsson
+        onboardingDate:
+          type: object
+          example: 11/08/2021 11:11:00
+        appType:
+          type: string
+        appStatus:
+          $ref: '#/components/schemas/appStatus'
+        appMode:
+          type: string
+          enum:
+            - ENABLED
+            - DISABLED
+        artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/artifacts'
+    artifacts:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: app-lcm
+        type:
+          type: string
+          example: model
+        version:
+          type: string
+          example: 6.1.0+66
+        status:
+          type: string
+          example: Success
+          enum:
+            - Success
+            - Inprogress
+            - Failed
+        location:
+          type: string
+          example: localhost
+        errorReponse:
+          type: string
+          example: No artifacts present
+    appsOnboarding:
+      type: object
+      properties:
+        file:
+          type: string
+          description: The file to be uploaded for the installation of apps should be in .csar format.
+          format: binary
+    uploadAccepted:
+      type: object
+      properties:
+        appId:
+          type: integer
+          example: 103
+    uploadBadRequest:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: Version already exists
+    artifactsBadRequest:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: No artifacts present
+    appStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - Uploaded
+            - Inprogress
+            - Failed
+            - Completed
+            - Deleting
+      example: Uploaded
+    appBadRequest:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: Id doesn't exist
+    artifactFile:
+      type: object
+      properties:
+        file:
+          type: object
+          description: The artifact file.
+          format: binary
+    artifactFileBadRequest:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: Could not found Artifact with id 1 in application
+    appOnboardingPutRequestDto:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+            - ENABLED
+            - DISABLED
+        status:
+          type: string
+          enum:
+            - DELETING
+    appIdNotFoundRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/v1/apps/188"
+        method:
+          type: string
+          example: "PUT"
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: "Application not found, ID: 188"
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: string
+          example: "NOT_FOUND"
+    appIdNotFoundDeleteRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/v1/apps/144"
+        method:
+          type: string
+          example: "DELETE"
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: "Application not found, ID: 144"
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: string
+          example: "NOT_FOUND"
+    notAcceptable:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/v1/apps/1"
+        method:
+          type: string
+          example: "DELETE"
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: "Unable to get header value for Docker-Content-Digest"
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: string
+          example: "NOT_ACCEPTABLE"
+    conflictRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/v1/apps/1"
+        method:
+          type: string
+          example: "DELETE"
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: "Could not find Artifact with id: 1 in application, id: 4"
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: string
+          example: "CONFLICT"
+    unauthorizedRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/v1/apps/1"
+        method:
+          type: string
+          example: "DELETE"
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: "Unauthorized to communicate with container registry"
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: string
+          example: "UNAUTHORIZED"
+    tooManyRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/v1/apps/1"
+        method:
+          type: string
+          example: "DELETE"
+        errorCode:
+          type: integer
+          example: 123
+        error:
+          type: string
+          example: "Unable to communicate with container registry, as too many requests have been made"
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: string
+          example: "TOO_MANY_REQUESTS"
+    internalServerError:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/v1/apps/1"
+        error:
+          type: string
+          example: "Internal Server Error"
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: string
+          example: "500"
+    appInvalidPutRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: "Bad Request"
+        path:
+          type: string
+          example: "/v1/apps/1"
+    appInvalidDeleteRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: "2021-08-19 19:10:25-07"
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: "Bad Request"
+        path:
+          type: string
+          example: "/v1/apps/1"
+    getFilterBadRequest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: "2022-09-09 10:10:25-07"
+        status:
+          type: string
+          example: "BAD_REQUEST"
+        error:
+          type: string
+          example: "{ 'queryParam': Query Parameter key should be either name, vendor, version or id }"
+        path:
+          type: string
+          example: "/v1/apps?q=name2:eric-oss-app-mgr"
+  responses:
+    Forbidden:
+      description: Forbidden
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Access Denied
+  examples:
+    appOnboardingPutRequest:
+      summary: A sample put request to App Onboarding endpoint
+      value:
+        mode: "ENABLED"

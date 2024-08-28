@@ -1,0 +1,149 @@
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+#Metrics related configurations
+management.endpoint.metrics.enabled: "true"
+management.endpoints.web.exposure.include: "*"
+management.endpoint.prometheus.enabled: "true"
+management.metrics.export.prometheus.enabled: "true"
+management.metrics.web.server.auto-time-requests: "true"
+management.info.env.enabled: "true"
+#Tracing properties
+management.tracing.propagation.produce: ${ERIC_PROPAGATOR_PRODUCE:[B3]}
+otel.exporter.otlp.traces.protocol: ${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL:grpc}
+
+#opentracing.jaeger.enabled: "true"
+management.endpoint.health.probes.enabled: "true"
+management.health.livenessState.enabled: "true"
+endpoints.health.sensitive: "false"
+info.app.name: '@name@'
+info.app.description: Microservice chassis app
+info.app.version: '@version@'
+info.app.legal: "COPYRIGHT Ericsson 2021 -
+ The copyright to the computer program(s) herein is the property of
+ Ericsson Inc. The programs may be used and/or copied only with written
+ permission from Ericsson Inc. or in accordance with the terms and
+ conditions stipulated in the agreement/contract under which the
+ program(s) have been supplied."
+
+#See more details about pattern layout: https://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html
+#See more details about logging.pattern.level : https://docs.spring.io/spring-boot/docs/2.5.2/reference/html/features.html#features.logging.custom-log-configuration
+#logging.pattern.level: "%5p [%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}][%X{userName}]"
+
+#Set the stubrunner credentials:
+#stubrunner.username: <LAN SIGNUM ID>
+#stubrunner.password: <LAN encripted PWD or JFrog API Key>
+stubrunner.username: ${SELI_ARTIFACTORY_REPO_USER}
+stubrunner.password: ${SELI_ARTIFACTORY_REPO_PASS}
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${ONBOARDING_JOBS_DB_USER}
+    password: ${ONBOARDING_JOBS_DB_USER_PASSWORD}
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+
+  flyway:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    user: ${ONBOARDING_JOBS_DB_USER}
+    password: ${ONBOARDING_JOBS_DB_USER_PASSWORD}
+    baseline-on-migrate: true
+    schemas: public, acm_schema
+
+
+  application:
+    name: app-onboarding
+  cloud:
+    discovery:
+      enabled: false
+
+deployment:
+  docker:
+    pythonJobImageName: ${PYTHON_JOB_IMAGE_NAME}
+  kubernetes:
+    activeDeadlineSeconds: ${ACTIVE_DEADLINE_SECONDS}
+    ttlSecondsAfterFinished: ${TTL_SECONDS_AFTER_FINISHED}
+  cron:
+    fetchRate: ${CRON_FETCH_RATE}
+    initialDelay: 300000
+  dataCleanup:
+    schedule:
+      fixedRate: ${DATA_CLEANUP_FIXED_RATE}
+      initialDelay: 60000
+      hangingJobAgeMinutes: 10
+  containerReg:
+    URL: ${CONT_REG_URL}
+    user: ${CONT_REG_USER}
+    password: ${CONT_REG_PASSWORD}
+  instanceName: ${INSTANCE_NAME}
+  serviceMeshEnabled: ${SERVICE_MESH_ENABLED}
+  tlsEnabled: ${TLS_ENABLED}
+  serviceMeshUserVolume: ${SM_USER_VOLUME}
+  serviceMeshVolumeMount: ${SM_USER_VOLUME_MOUNT}
+
+logging:
+  config: ${LOGBACK_CONFIG_FILE:classpath:custom-logback-json.xml}
+
+artifactRegistryRetry:
+  delay: ${RETRY_DELAY_MS}
+  maxAttempts: ${RETRY_MAX_ATTEMPTS}
+
+appPackageExecutor:
+  threadsCount: ${APP_EXECUTOR_THREADS_COUNT:5}
+  queueCapacity: ${APP_EXECUTOR_QUEUE_CAPACITY:5}
+
+onboarding-job:
+  tempFolderLocation: /temp
+
+dataAccessRetry:
+  delay: ${DATA_ACCESS_RETRY_DELAY_MS:20000}
+  maxAttempts: ${DATA_ACCESS_RETRY_MAX_ATTEMPTS:7}
+
+lcmServiceRetry:
+  delay: 20000
+  maxAttempts: 7
+
+object-store:
+  hostname: ${OBJECT_STORE_HOSTNAME:eric-data-object-storage-mn}
+  port: 9000
+  credentials:
+    username: ${OBJECT_STORE_USERNAME:default}
+    password: ${OBJECT_STORE_PASSWORD:default}
+  bucketName: ${OBJECT_STORE_BUCKET:app-management}
+  bucketCheckRetry:
+    delay: ${OBJECT_STORE_BUCKET_CHECK_DELAY:60000}
+    maxAttempts: ${OBJECT_STORE_BUCKET_CHECK_MAX_ATTEMPTS:60}
+
+ericsson:
+  tracing:
+    enabled: ${ERIC_TRACING_ENABLED:true}
+    polingInterval: ${ERIC_TRACING_POLING_INTERVAL:30}
+    exporter:
+      endpoint: ${ERIC_EXPORTER_ENDPOINT:http://eric-dst-collector:4317}
+      protocol: ${ERIC_EXPORTER_PROTOCOL:grpc}
+    sampler:
+      jaeger_remote:
+        endpoint: ${ERIC_SAMPLER_JAEGER_REMOTE_ENDPOINT:http://eric-dst-collector:14250}
+    endpoints:
+      exclude: /actuator/prometheus, /actuator/health,/ping, /metric
+
+audit-log:
+  include-pattern:
+    - "/v1/**"
+    - "/v2/**"

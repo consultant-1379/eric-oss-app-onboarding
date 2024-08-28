@@ -1,0 +1,52 @@
+{
+  "items": [
+  {
+    "id": "26471a81-1de4-4ad9-9724-326eefd22230",
+    "type": "rApp",
+    "name": "App-Onboarding-helloWorld",
+    "version": "2.2.2",
+    "provider": "Ericsson",
+    "mode": "DISABLED",
+    "status": "CREATED",
+    "createdAt": "2023-04-06T00:04:16.711Z",
+    "components": [
+      {
+        "type": "Microservice",
+        "name": "eric-oss-hello-world-app",
+        "version": "1.1.1",
+        "artifacts": [
+          {
+            "name": "eric-oss-hello-world-app",
+            "type": "HELM",
+            "location": "{{ID_PLACEHOLDER}}/eric-oss-hello-world-app"
+          },
+          {
+            "name": "docker.tar",
+            "type": "IMAGE",
+            "location": "{{ID_PLACEHOLDER}}/docker"
+          }
+        ]
+      }
+    ],
+    "permissions": [
+      {
+        "resource": "nginx",
+        "scope": "foo"
+      },
+      {
+        "resource": "mongoDB",
+        "scope": "goodbyeWorld"
+      }
+    ],
+    "roles": [
+      {
+        "name": "admin"
+      }
+    ],
+    "events": [],
+    "self": {
+      "href": "app-lifecycle-management/v3/apps/26471a81-1de4-4ad9-9724-326eefd22230"
+    }
+  }
+  ]
+}

@@ -1,0 +1,16 @@
+TOSCA-Meta-File-Version: 1.0
+CSAR-Version: 1.1
+Created-By: Ericsson
+Entry-Definitions: Definitions/AppDescriptor.yaml
+Entry-OtherDefinitions: OtherDefinitions/ASD/ASD.yaml
+Entry-Change-Log: ChangeLog.txt
+# Entry-Licenses: Licenses/   # Not yet supported
+# Entry-Security: Security/   # Not yet supported
+
+
+
+#Definitions/AppDescriptor.yaml
+
+
+# If we want to add another entry-otherDefinitions file .
+# ASD.yaml; xxx.yaml; xx.ymal

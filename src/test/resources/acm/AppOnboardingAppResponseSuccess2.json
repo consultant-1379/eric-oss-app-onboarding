@@ -1,0 +1,29 @@
+{
+    "id": 2,
+    "name": "eric-oss-anr5gassist",
+    "version": "1.0.51",
+    "size": "100MB",
+    "vendor": "Ericsson",
+    "type": "rApp",
+    "onboardedDate": "2021-11-19T13:36:32.185+00:00",
+    "status": "ONBOARDED",
+    "artifacts": [
+        {
+            "id": 5,
+            "name": "eric-oss-anr5gassist",
+            "type": "HELM",
+            "version": "1.0.51",
+            "status": "COMPLETED",
+            "location": "/eric-oss-anr5gassist-1.0.51/charts/eric-oss-anr5gassist/1.0.51"
+        },
+        {
+            "id": 6,
+            "name": "docker.tar",
+            "type": "IMAGE",
+            "version": "--",
+            "status": "COMPLETED",
+            "location": "/v2/armdocker.rnd.ericsson.se/proj-eric-oss-drop/eric-oss-helm-test/manifests/1.0.0-1"
+        }
+    ],
+    "events": []
+}

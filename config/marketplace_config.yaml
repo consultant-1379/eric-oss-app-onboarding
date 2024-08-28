@@ -1,0 +1,36 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+documents:
+  - name: eric-oss-app-onboarding-sdk-docs
+    files:
+      - ../doc/sdk-docs/.service_name
+      - ../doc/sdk-docs/about-the-service.md
+      - ../doc/sdk-docs/concepts.md
+      - ../doc/sdk-docs/developer-guide-use-cases.md
+      - ../doc/sdk-docs/developer-guide-create-csar.md
+      - ../doc/sdk-docs/overview.md
+      - ../doc/sdk-docs/TEMPLATE_VERSION
+      - ../doc/sdk-docs/sdk-service-docs-config.yaml
+      - ../doc/sdk-docs/img/App_Onboarding_Service_Architecture.svg
+      - ../doc/sdk-docs/img/App_Package_Basic.svg
+      - ../doc/sdk-docs/img/Icon-APIDocumentation.png
+      - ../doc/sdk-docs/img/Icon-DevGuide.png
+      - ../doc/sdk-docs/img/Icon-GettingStarted.png
+      - ../doc/sdk-docs/img/Icon-Resources.png
+  - name: eric-oss-app-onboarding-openapi
+    files:
+      - ../src/main/resources/v1/eric-oss-app-onboarding-openapi.yaml

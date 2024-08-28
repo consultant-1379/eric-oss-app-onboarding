@@ -1,0 +1,53 @@
+{{- if .Release.IsUpgrade -}}
+{{- if .Values.global -}}
+{{- if and .Values.global.networkPolicy .Values.networkPolicy -}}
+{{- if and .Values.global.networkPolicy.enabled .Values.networkPolicy.enabled -}}
+
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ template "eric-oss-app-onboarding.name" . }}-app-mgr-db-consolidation-policy
+  labels:
+    {{- include "eric-oss-app-onboarding.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-11"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    {{- include "eric-oss-app-onboarding.annotations" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ index .Values "eric-data-document-db" "name" | quote }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            job-name: {{ include "eric-oss-app-onboarding.name" . }}-db-consolidation-hook
+      - podSelector:
+          matchLabels:
+            job-name: {{ include "eric-oss-app-onboarding.name" . }}-create-db-in-app-mgr-db-hook
+      ports:
+        - protocol: TCP
+          port: 5432
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,607 @@
+#
+# COPYRIGHT Ericsson 2024
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+openapi: 3.0.2
+info:
+  x-api-id: 58e4347d-6a0f-48ac-83d1-e47f137312fa
+  x-audience: external-partner
+  description: |
+    The App Onboarding API allows users to manage the onboarding of a CSAR package containing an App.
+  version: 2.0.0
+  title: App Onboarding API
+  license:
+    name: COPYRIGHT Ericsson 2024
+    url: "https://www.ericsson.com/en/legal"
+  termsOfService: "https://www.ericsson.com/en/legal"
+  contact:
+    url: https://www.ericsson.com
+tags:
+  - name: App Packages
+    description: Request onboarding of App Package CSAR content
+  - name: Onboarding Jobs
+    description: Manage the execution of the app package onboarding procedure and provide status and summary information
+servers:
+  - url: https://{host}/app-onboarding/v2
+    variables:
+      host:
+        default: localhost
+        description: Change this value to point to your custom host
+paths:
+  /app-packages:
+    post:
+      summary: "Request to onboard a new CSAR App Package"
+      description: |
+        Use this endpoint to onboard an App Package in the system. The provided App package is uploaded, and an onboarding-job is created
+        to handle the onboarding process.
+        A successful response to this request indicates that the request was accepted, the package was uploaded successfully and is now being processed.
+        While the onboarding-job is executed, the artifacts in the package are extracted and stored internally, and a new App representing
+        the CSAR package content is created in the system.
+        Users can GET the onboarding-job using the 'id' or link provided in the response, and check the execution status until the onboarding has completed successfully.
+        Once the onboarding-job is created successfully, App Manager Lifecycle Management (LCM) requests can be used to manage the App.
+      tags:
+        - App Packages
+      operationId: "onboardAppPackage"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AppPackageRequest"
+        required: true
+      responses:
+        '202':
+          description: "Accepted"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppPackageResponse'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+  /onboarding-jobs:
+    get:
+      summary: "Get all onboarding-jobs or a filtered list using optional query parameters"
+      description: |
+        Gets all onboarding-jobs created in App Manager or a filtered list of onboarding-jobs using the optional query parameters.  
+        Note that only a single property query parameter is allowed in the request.  
+        Query parameters are handled in a case sensitive manner, and unrecognised parameters will be ignored.
+        
+        Pagination and sorting of the returned onboarding-jobs is also supported.
+      tags:
+        - Onboarding Jobs
+      operationId: "getAllOnboardingJobs"
+      parameters:
+        - name: Accept
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: |
+           Filter by 'id' property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryById:
+              summary: Example of Query By ID
+              value: /onboarding-jobs?id=b420b409-5da9-4d69-8adb-9c947ded859e
+        - name: fileName
+          in: query
+          description: |
+           Filter by 'fileName' property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByName:
+              summary: Example of Query By File Name
+              value: /onboarding-jobs?fileName=eric-oss-hello-world-app.csar
+        - name: vendor
+          in: query
+          description: |
+            Filter by 'vendor' property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByVendor:
+              summary: Example of Query By Vendor
+              value: /onboarding-jobs?vendor=Ericsson
+        - name: packageVersion
+          in: query
+          description: |
+            Filter by 'packageVersion' property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByVersion:
+              summary: Example of Query By Package Version
+              value: /onboarding-jobs?packageVersion=1.1.10
+        - name: type
+          in: query
+          description: |
+            Filter by 'type' property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByType:
+              summary: Example of Query By Type
+              value: /onboarding-jobs?type=rApp
+        - name: packageSize
+          in: query
+          description: |
+            Filter by 'packageSize' property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByPackageSize:
+              summary: Example of Query By Package Size
+              value: /onboarding-jobs?packageSize=178.3647MiB
+        - name: status
+          in: query
+          description: |
+            Filter by 'status' property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByStatus:
+              summary: Example of Query By Status
+              value: /onboarding-jobs?status=ONBOARDED
+        - name: appId
+          in: query
+          description: |
+            Filter by 'appId property.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            queryByAppId:
+              summary: Example of Query By App ID
+              value: /onboarding-jobs?appId=0a4d6f87-0f46-4426-a13e-893e80322eb6
+        - name: sort
+          in: query
+          description: |
+            Users can sort the returned onboarding-jobs by any of the job properties:  fileName, vendor, packageVersion, id, type, packageSize, status or appId.
+            The sort direction is ASCENDING for all properties.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            sortByName:
+              summary: Example of Sort By fileName
+              value: /onboarding-jobs?sort=fileName
+            sortByVendor:
+              summary: Example of Sort By vendor
+              value: /onboarding-jobs?sort=vendor
+            sortByVersion:
+              summary: Example of Sort By packageVersion
+              value: /onboarding-jobs?sort=packageVersion
+            sortByID:
+              summary: Example of Sort By id
+              value: /onboarding-jobs?sort=id
+            sortByType:
+              summary: Example of Sort By type
+              value: /onboarding-jobs?sort=type
+            sortByPackageSize:
+              summary: Example of Sort By packageSize
+              value: /onboarding-jobs?sort=packageSize
+            sortByStatus:
+              summary: Example of Sort By status
+              value: /onboarding-jobs?sort=status
+            sortByAppID:
+              summary: Example of Sort By appId
+              value: /onboarding-jobs?sort=appId
+        - name: offset
+          in: query
+          description: |
+            To get a paginated list of onboarding-jobs, use the offset and limit query params to manage the number of jobs returned.
+            The offset specifies the start element for the jobs returned. To get the next page of entries, the API needs to be called with an offset
+            parameter that equals the sum of the previous offset value and limit returned in the previous result.
+          required: false
+          explode: true
+          schema:
+            type: string
+          examples:
+            offsetExample:
+              summary: Example of Offset
+              value: /onboarding-jobs?offset=11&limit=10
+        - name: limit
+          in: query
+          description: |
+            Limit is used with the offset query param to return a paginated list of onboarding-jobs. The limit specifies the max number of onboarding-jobs to return.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+          examples:
+            pageLimitExample:
+              summary: Example of Limit
+              value: /onboarding-jobs?offset=11&limit=10
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingJobItems'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  /onboarding-jobs/{jobId}:
+    get:
+      summary: Get the onboarding-job for the given job Id
+      description: |
+        Return the onboarding-job for the given onboarding-job Id value.
+      tags:
+        - "Onboarding Jobs"
+      operationId: "getJobById"
+      parameters:
+        - name: Accept
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: jobId
+          in: path
+          description: The Id of the onboarding-job to be retrieved.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingJob'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Delete the onboarding-job for the given job Id
+      description: |
+        Deletes an onboarding-job for the given onboarding-job Id. The job and its summary data are deleted from the system.
+      tags:
+        - "Onboarding Jobs"
+      operationId: "deleteOnboardingJob"
+      parameters:
+        - name: Accept
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: jobId
+          in: path
+          description: "The Id of the onboarding-job to be deleted."
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: "No Content"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  schemas:
+    AppPackageRequest:
+      description: |
+        Request body when onboarding a new App Package
+      required:
+        - file
+      type: object
+      properties:
+        file:
+          type: string
+          description: |
+            The App package file to be onboarded, it must be provided in .csar format
+          format: binary
+
+    AppPackageResponse:
+      description: |
+        Response to an package onboard request. The package has been UPLOADED successfully and an onboarding-job is created.
+        The response contains the id and a link to the new onboarding-job handling the request in the system.
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: "The name of the accepted CSAR App Package"
+          example: "eric-oss-hello-world-app.csar"
+        onboardingJob:
+          description: |
+            The onboarding job handling the onboarding of the App Package in the system.
+          $ref: '#/components/schemas/OnboardingJobLink'
+      example:
+        fileName: "eric-oss-hello-world-app.csar"
+        onboardingJob:
+          id: "9cc1047a-5aae-4630-893a-1536392cbd2b"
+          href: "app-onboarding/v2/onboarding-jobs/9cc1047a-5aae-4630-893a-1536392cbd2b"
+
+    OnboardingJob:
+      description: |
+        The job resource provides information about a request to onboard a CSAR package in App Manager.
+        For ongoing jobs, it provides information like current status and progress event data. For completed jobs,
+        it provides a final summary of the job.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Unique Id of the created onboarding-job. This is a type UUID."
+          example: "9cc1047a-5aae-4630-893a-1536392cbd2b"
+        fileName:
+          type: string
+          description: "The name of CSAR file onboarded"
+          example: "eric-oss-hello-world-app.csar"
+        packageVersion:
+          type: string
+          description: "The version of the onboarded CSAR package"
+          example: "1.1.1"
+        packageSize:
+          type: string
+          description: "The size of the CSAR onboarded, in mebibyte format."
+          example: "100MiB"
+        vendor:
+          type: string
+          description: "The vendor of the App. This information is found in the Tosca.meta file bundled in the CSAR uploaded."
+          example: "Ericsson"
+        type:
+          type: string
+          description: "Type of the App. This info is available in AppDescriptor.yaml as 'APPType'."
+          example: "rApp"
+        onboardStartedAt:
+          type: string
+          description: 'Date-time when onboarding-job started in UTC format YYYY-MM-DDTHH:MM:SS.mmmZ'
+          example: "2023-12-20T12:00:06.996762Z"
+        status:
+          $ref: '#/components/schemas/OnboardingJobStatus'
+        onboardEndedAt:
+          type: string
+          description: 'Date-time when onboarding-job ended in UTC format YYYY-MM-DDTHH:MM:SS.mmmZ'
+          example: "2023-12-20T12:00:54.798965Z"
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnboardingEvent'
+        self:
+          description: A link to this onboarding-job
+          $ref: '#/components/schemas/LinksHref'
+        app:
+          description: The App created in the system from the onboarded App Package
+          $ref: '#/components/schemas/AppLink'
+      example:
+        id: "9cc1047a-5aae-4630-893a-1536392cbd2b"
+        fileName: "eric-oss-hello-world-app.csar"
+        packageVersion: "1.1.1"
+        packageSize: "100MiB"
+        vendor: "Ericsson"
+        type: "rApp"
+        onboardStartedAt: "2023-12-20T12:00:06.996762Z"
+        status: "ONBOARDED"
+        onboardEndedAt: "2023-12-20T12:00:54.798965Z"
+        events:
+          - type: "INFO"
+            title: "Stored 1 out of 3 artifacts"
+            detail: "Uploaded eric-oss-hello-world-app"
+            occurredAt: "2023-12-20T12:00:47.937804Z"
+          - type: "INFO"
+            title: "Stored 2 out of 3 artifacts"
+            detail: "Uploaded docker.tar"
+            occurredAt: "2023-12-20T12:00:48.063780Z"
+          - type: "INFO"
+            title: "Stored 3 out of 3 artifacts"
+            detail: "Uploaded ASD.yaml"
+            occurredAt: "2023-12-20T12:00:48.110092Z"
+        self:
+          href: "app-onboarding/v2/onboarding-jobs/9cc1047a-5aae-4630-893a-1536392cbd2b"
+        app:
+          id: "26471a81-1de4-4ad9-9724-326eefd22230"
+          href: "app-lifecycle-management/v3/apps/26471a81-1de4-4ad9-9724-326eefd22230"
+
+    OnboardingJobLink:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Unique Id of the onboarding-job handling the onboarding request."
+          example: "9cc1047a-5aae-4630-893a-1536392cbd2b"
+        href:
+          type: string
+          description: |
+            A link to the job handling the onboarding of the App Package in the system.
+      required:
+        - id
+        - href
+
+    AppLink:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Unique Id of the App created in the system."
+          example: "26471a81-1de4-4ad9-9724-326eefd22230"
+        href:
+          type: string
+          description: |
+            A link to the App created in the system.
+      required:
+        - id
+        - href
+
+    LinksHref:
+      description: A href link to a resource in the system
+      type: object
+      properties:
+        href:
+          type: string
+      required:
+        - href
+
+    OnboardingJobStatus:
+      description: |
+        Current status of the onboarding-job. It can be any one of:
+          * UPLOADED
+            The App Package CSAR file provided in the request body was uploaded successfully to the system.
+          * UNPACKED
+            The App Package CSAR content was successfully unpacked.
+          * PARSED
+            The artifact information for all App components was parsed and read successfully.
+          * ONBOARDED
+            The artifact information was stored and an App was created successfully in the system.
+          * FAILED
+            The onboarding procedure failed. Internal rollback deletes any stored artifacts.
+          * ROLLBACK_FAILED
+            Internal rollback after an unsuccessful onboarding has failed. Some artifacts can not have been deleted from the system for this onboarding-job.
+      type: string
+      enum:
+        - UPLOADED
+        - UNPACKED
+        - PARSED
+        - ONBOARDED
+        - FAILED
+        - ROLLBACK_FAILED
+      example: ONBOARDED
+    OnboardingEvent:
+      description: |
+        Events provides additional information to the user in the response. Events can be of type ERROR or INFO.
+        ERROR events provide details about failures that occurred during execution of API request.
+        INFO events provide additional details to the user about execution of the API operation, for example, progress
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/OnboardingEventType'
+        title:
+          description: "Summary of the event content"
+          type: string
+          example: "Stored 1 out of 6 artifacts"
+        detail:
+          description: "Additional details about the event"
+          type: string
+          example: "Uploaded docker.tar"
+        occurredAt:
+          type: string
+          example: "2023-12-20T12:00:47.937804Z"
+
+    OnboardingJobItems:
+      type: object
+      properties:
+        items:
+          description: The list of onboarding jobs
+          type: array
+          items:
+            $ref: "#/components/schemas/OnboardingJob"
+
+    OnboardingEventType:
+      description: |
+        Events provides additional information to the user in the response. Events can be of type ERROR or INFO.
+        ERROR events provide details about failures that occurred during execution of API request.
+        INFO events provide additional details to the user about execution of the API operation, for example, progress
+      type: string
+      enum:
+        - INFO
+        - ERROR
+      example: INFO
+
+    ProblemDetails:
+      description: |
+        Data describing any error that has occurred while processing a request from a user.
+      required:
+        - status
+        - detail
+      type: object
+      properties:
+        status:
+          description: "The HTTP status code generated by the server"
+          type: integer
+        title:
+          description: "A short, human-readable summary of the problem type."
+          type: string
+        detail:
+          description: "A human-readable explanation specific to this occurrence of the problem."
+          type: string
+
+  responses:
+    BadRequest:
+      description: "Bad Request"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+          example:
+            status: 400
+            title: "Bad Request"
+            detail: "The message body is missing a required field"
+
+    NotFound:
+      description: "Not Found"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+          example:
+            status: 404
+            title: "Not Found"
+            detail: "Onboarding-job with ID 9cc1047a-5aae-4630-893a-1536392cbd2b was not found"
+
+    InternalServerError:
+      description: "Internal Server Error"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+          example:
+            status: 500
+            title: "Internal Server Error"
+            detail: "Data access error during communication to database."

@@ -1,0 +1,22 @@
+documents:
+  # document name
+  - name: app-dev-guide
+    # file names of files to be packaged in the document
+    files:
+      - developers_guide/developers_guide_template.md
+  - name: user-guide
+    # file names of files to be packaged in the document
+    files:
+      - user_guide/user_guide_template.md
+      - user_guide/App_Onboarding_Service_Deployment_Architecture.png
+      - user_guide/App_Onboarding_Service_Deployment_Architecture_V2.png
+  - name: pri
+    files:
+      - pri.md
+  - name: software-vendor-list
+    files:
+      - software-vendor-list.md
+  - name: test-report
+    files:
+      - test-report.md
+

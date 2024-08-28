@@ -1,0 +1,64 @@
+{
+  "id": "26471a81-1de4-4ad9-9724-326eefd22230",
+  "type": "rApp",
+  "name": "App-Onboarding-helloWorld",
+  "version": "2.2.2",
+  "mode": "DISABLED",
+  "status": "CREATED",
+  "createdAt": "2023-04-06T00:04:16.711Z",
+  "components": [
+    {
+      "type": "Microservice",
+      "name": "eric-oss-hello-world-app",
+      "version": "1.1.1",
+      "artifacts": [
+        {
+          "name": "eric-oss-hello-world-app",
+          "type": "HELM",
+          "location": "26471a81-1de4-4ad9-9724-326eefd22230/eric-oss-hello-world-app"
+        },
+        {
+          "name": "docker.tar",
+          "type": "IMAGE",
+          "location": "26471a81-1de4-4ad9-9724-326eefd22230/docker"
+        }
+      ]
+    },
+    {
+      "type": "DataManagement",
+      "name": "data-management",
+      "version": "0.1.0-1",
+      "artifacts": [
+        {
+          "name": "input-data-specification.json",
+          "type": "OPAQUE",
+          "location": "26471a81-1de4-4ad9-9724-326eefd22230/input-data-specification.json"
+        },
+        {
+          "name": "input-data-specification-subdirectory.json",
+          "type": "OPAQUE",
+          "location": "26471a81-1de4-4ad9-9724-326eefd22230/input-data-specification-subdirectory.json"
+        }
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "resource": "nginx",
+      "scope": "foo"
+    },
+    {
+      "resource": "mongoDB",
+      "scope": "goodbyeWorld"
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin"
+    }
+  ],
+  "events": [],
+  "self": {
+    "href": "app-lifecycle-management/v3/apps/26471a81-1de4-4ad9-9724-326eefd22230"
+  }
+}

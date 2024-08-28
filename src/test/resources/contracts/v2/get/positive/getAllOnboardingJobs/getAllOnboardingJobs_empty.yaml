@@ -1,0 +1,30 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+description: Get all onboarding jobs empty response
+name: Get all onboarding jobs empty response
+priority: 4
+request:
+  method: GET
+  urlPath: /v2/onboarding-jobs?fileName=eric-oss-not-onboarded-app.csar
+  headers:
+    Content-Type: application/json
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  bodyFromFile: emptyResponse.json

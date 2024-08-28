@@ -1,0 +1,45 @@
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+
+Description of an APP:
+  APPName: App-Onboarding-helloWorld
+  APPVersion: 1.0.0
+  APPType: rApp
+APPComponent:
+  NameofComponent: eric-oss-app-onboarding
+  Version: 0.1.0-1
+  Path: OtherDefinitions/ASD/ASD.yaml
+  ArtefactType: Microservice
+  Configuration:
+     Path: /filename/path #Both Options for support the file and construct params  #values.yaml - Optional
+  ServiceDependency:
+      Required:
+            API: /v1/helloWorld/     #This is the route exposed by the API gateway// API gateway deals with Routes//
+      Exposed:
+            API: otherDefinitions/eric-oss-app-onboarding-openapi.yaml    # this should point to the location in the package//  To be discussed in future
+APPPermissions:
+  - Resource: kafka
+    Scope: test
+  - Resource: BDR
+    Scope: readPolicy
+  - Resource: Test_Resource
+    Scope: dummy
+APPRoles:
+  - Name: admin
+
+
+

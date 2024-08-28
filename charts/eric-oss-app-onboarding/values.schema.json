@@ -1,0 +1,1672 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Root Schema",
+  "type": "object",
+  "required": [
+    "podSecurityContext",
+    "networkPolicy",
+    "replicaCount",
+    "podDisruptionBudget",
+    "hooklauncher",
+    "updateStrategy",
+    "labels",
+    "imageCredentials",
+    "nameOverride",
+    "fullnameOverride",
+    "serviceAccount",
+    "podAnnotations",
+    "podPriority",
+    "annotations",
+    "service",
+    "ingress",
+    "eric-pm-server",
+    "prometheus",
+    "resources",
+    "probes",
+    "autoScaling",
+    "nodeSelector",
+    "topologySpreadConstraints",
+    "tolerations",
+    "affinity",
+    "terminationGracePeriodSeconds",
+    "helmReg",
+    "persistence",
+    "contReg",
+    "app-lcm",
+    "eric-data-document-db",
+    "pythonJob",
+    "cron",
+    "artifactRegistryRetry",
+    "bandwidth",
+    "serviceMesh",
+    "log",
+    "logShipper",
+    "appArmorProfile",
+    "seccompProfile",
+    "appPackageExecutor",
+    "dataAccessRetry",
+    "objectStore",
+    "api-gateway-route",
+    "dst"
+  ],
+  "properties": {
+    "podSecurityContext": {
+      "title": "The podSecurityContext Schema",
+      "type": "object",
+      "properties": {
+        "supplementalGroups": {
+          "title": "The supplementalGroups Schema"
+        }
+      }
+    },
+    "networkPolicy": {
+      "title": "The networkPolicy Schema",
+      "type": "object",
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "title": "The enabled Schema",
+          "type": "boolean"
+        }
+      }
+    },
+    "replicaCount": {
+      "title": "The replicaCount Schema",
+      "type": "number"
+    },
+    "podDisruptionBudget": {
+      "title": "The podDisruptionBudget Schema",
+      "type": "object",
+      "required": [
+        "minAvailable"
+      ],
+      "properties": {
+        "minAvailable": {
+          "title": "The minAvailable Schema",
+          "type": "string"
+        }
+      }
+    },
+    "hooklauncher": {
+      "title": "The hooklauncher Schema",
+      "type": "object",
+      "required": [
+        "cleanup",
+        "terminateEarlyOnFailure",
+        "backoffLimit"
+      ],
+      "properties": {
+        "cleanup": {
+          "title": "The cleanup Schema",
+          "type": "string"
+        },
+        "terminateEarlyOnFailure": {
+          "title": "The terminateEarlyOnFailure Schema",
+          "type": "string"
+        },
+        "backoffLimit": {
+          "title": "The backoffLimit Schema",
+          "type": "number"
+        }
+      }
+    },
+    "updateStrategy": {
+      "title": "The updateStrategy Schema",
+      "type": "object",
+      "required": [
+        "type",
+        "rollingUpdate"
+      ],
+      "properties": {
+        "type": {
+          "title": "The type Schema",
+          "type": "string"
+        },
+        "rollingUpdate": {
+          "title": "The rollingUpdate Schema",
+          "type": "object",
+          "required": [
+            "maxSurge",
+            "maxUnavailable"
+          ],
+          "properties": {
+            "maxSurge": {
+              "title": "The maxSurge Schema",
+              "type": "number"
+            },
+            "maxUnavailable": {
+              "title": "The maxUnavailable Schema",
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "labels": {
+      "title": "The labels Schema",
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "imageCredentials": {
+      "title": "The imageCredentials Schema",
+      "type": "object",
+      "required": [
+        "eric-oss-app-onboarding",
+        "eric-oss-app-onboardingTest",
+        "hooklauncher",
+        "kubeclient"
+      ],
+      "properties": {
+        "repoPath": {
+          "title": "The repoPath Schema"
+        },
+        "eric-oss-app-onboarding": {
+          "title": "The eric-oss-app-onboarding Schema",
+          "type": "object",
+          "required": [
+            "registry"
+          ],
+          "properties": {
+            "repoPath": {
+              "title": "The repoPath Schema"
+            },
+            "registry": {
+              "title": "The registry Schema",
+              "type": "object",
+              "properties": {
+                "imagePullPolicy": {
+                  "title": "The imagePullPolicy Schema"
+                },
+                "url": {
+                  "title": "The url Schema"
+                }
+              }
+            },
+            "pullSecret": {
+              "title": "The pullSecret Schema"
+            }
+          }
+        },
+        "eric-oss-app-onboardingTest": {
+          "title": "The eric-oss-app-onboardingTest Schema",
+          "type": "object",
+          "properties": {
+            "repoPath": {
+              "title": "The repoPath Schema"
+            },
+            "pullSecret": {
+              "title": "The pullSecret Schema"
+            }
+          }
+        },
+        "hooklauncher": {
+          "title": "The hooklauncher Schema",
+          "type": "object",
+          "required": [
+            "registry"
+          ],
+          "properties": {
+            "registry": {
+              "title": "The registry Schema",
+              "type": "object",
+              "properties": {
+                "url": {
+                  "title": "The url Schema"
+                },
+                "imagePullPolicy": {
+                  "title": "The imagePullPolicy Schema"
+                }
+              }
+            },
+            "repoPath": {
+              "title": "The repoPath Schema"
+            }
+          }
+        },
+        "kubeclient": {
+          "title": "The kubeclient Schema",
+          "type": "object",
+          "required": [
+            "registry"
+          ],
+          "properties": {
+            "registry": {
+              "title": "The registry Schema",
+              "type": "object",
+              "properties": {
+                "url": {
+                  "title": "The url Schema"
+                },
+                "imagePullPolicy": {
+                  "title": "The imagePullPolicy Schema"
+                }
+              }
+            },
+            "repoPath": {
+              "title": "The repoPath Schema"
+            }
+          }
+        }
+      }
+    },
+    "nameOverride": {
+      "title": "The nameOverride Schema",
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "title": "The fullnameOverride Schema",
+      "type": "string"
+    },
+    "serviceAccount": {
+      "title": "The serviceAccount Schema",
+      "type": "object",
+      "required": [
+        "create",
+        "name"
+      ],
+      "properties": {
+        "create": {
+          "title": "The create Schema",
+          "type": "boolean"
+        },
+        "name": {
+          "title": "The name Schema",
+          "type": "string"
+        }
+      }
+    },
+    "podAnnotations": {
+      "title": "The podAnnotations Schema",
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "podPriority": {
+      "title": "The podPriority Schema",
+      "type": "object",
+      "required": [
+        "eric-oss-app-onboarding",
+        "hooklauncher"
+      ],
+      "properties": {
+        "eric-oss-app-onboarding": {
+          "title": "The eric-oss-app-onboarding Schema",
+          "type": "object",
+          "required": [
+            "priorityClassName"
+          ],
+          "properties": {
+            "priorityClassName": {
+              "title": "The priorityClassName Schema",
+              "type": "string"
+            }
+          }
+        },
+        "hooklauncher": {
+          "title": "The hooklauncher Schema",
+          "type": "object",
+          "required": [
+            "priorityClassName"
+          ],
+          "properties": {
+            "priorityClassName": {
+              "title": "The priorityClassName Schema",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "annotations": {
+      "title": "The annotations Schema",
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "service": {
+      "title": "The service Schema",
+      "type": "object",
+      "required": [
+        "type",
+        "port",
+        "endpoints"
+      ],
+      "properties": {
+        "type": {
+          "title": "The type Schema",
+          "type": "string"
+        },
+        "port": {
+          "title": "The port Schema",
+          "type": "number"
+        },
+        "endpoints": {
+          "title": "The endpoints Schema",
+          "type": "object",
+          "required": [
+            "chassisapi"
+          ],
+          "properties": {
+            "chassisapi": {
+              "title": "The chassisapi Schema",
+              "type": "object",
+              "required": [
+                "tls"
+              ],
+              "properties": {
+                "tls": {
+                  "title": "The tls Schema",
+                  "type": "object",
+                  "required": [
+                    "enforced",
+                    "verifyClientCertificate"
+                  ],
+                  "properties": {
+                    "enforced": {
+                      "title": "The enforced Schema",
+                      "type": "string"
+                    },
+                    "verifyClientCertificate": {
+                      "title": "The verifyClientCertificate Schema",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "title": "The ingress Schema",
+      "type": "object",
+      "required": [
+        "enabled",
+        "ingressClass",
+        "hosts",
+        "tls"
+      ],
+      "properties": {
+        "enabled": {
+          "title": "The enabled Schema",
+          "type": "boolean"
+        },
+        "ingressClass": {
+          "title": "The ingressClass Schema",
+          "type": "string"
+        },
+        "hosts": {
+          "title": "The hosts Schema",
+          "type": "array",
+          "items": {
+            "title": "A Schema",
+            "type": "object",
+            "required": [
+              "host",
+              "paths"
+            ],
+            "properties": {
+              "host": {
+                "title": "The host Schema",
+                "type": "string"
+              },
+              "paths": {
+                "title": "The paths Schema",
+                "type": "array",
+                "items": {
+                  "title": "A Schema",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tls": {
+          "title": "The tls Schema",
+          "type": "object",
+          "required": [],
+          "properties": {}
+        }
+      }
+    },
+    "eric-pm-server": {
+      "title": "The eric-pm-server Schema",
+      "type": "object",
+      "required": [
+        "rbac"
+      ],
+      "properties": {
+        "rbac": {
+          "title": "The rbac Schema",
+          "type": "object",
+          "required": [
+            "appMonitoring"
+          ],
+          "properties": {
+            "appMonitoring": {
+              "title": "The appMonitoring Schema",
+              "type": "object",
+              "required": [
+                "enabled"
+              ],
+              "properties": {
+                "enabled": {
+                  "title": "The enabled Schema",
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "prometheus": {
+      "title": "The prometheus Schema",
+      "type": "object",
+      "required": [
+        "path",
+        "scrape",
+        "role",
+        "interval"
+      ],
+      "properties": {
+        "path": {
+          "title": "The path Schema",
+          "type": "string"
+        },
+        "scrape": {
+          "title": "The scrape Schema",
+          "type": "boolean"
+        },
+        "role": {
+          "title": "The role Schema",
+          "type": "string"
+        },
+        "interval": {
+          "title": "The interval Schema",
+          "type": "string"
+        }
+      }
+    },
+    "resources": {
+      "title": "The resources Schema",
+      "type": "object",
+      "required": [
+        "eric-oss-app-onboarding",
+        "eric-oss-app-onboardingTest",
+        "hooklauncher",
+        "logshipper",
+        "initdb"
+      ],
+      "properties": {
+        "eric-oss-app-onboarding": {
+          "title": "The eric-oss-app-onboarding Schema",
+          "type": "object",
+          "required": [
+            "requests",
+            "limits"
+          ],
+          "properties": {
+            "requests": {
+              "title": "The requests Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            },
+            "limits": {
+              "title": "The limits Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "eric-oss-app-onboardingTest": {
+          "title": "The eric-oss-app-onboardingTest Schema",
+          "type": "object",
+          "required": [
+            "requests",
+            "limits"
+          ],
+          "properties": {
+            "requests": {
+              "title": "The requests Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            },
+            "limits": {
+              "title": "The limits Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "hooklauncher": {
+          "title": "The hooklauncher Schema",
+          "type": "object",
+          "required": [
+            "requests",
+            "limits"
+          ],
+          "properties": {
+            "requests": {
+              "title": "The requests Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            },
+            "limits": {
+              "title": "The limits Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "logshipper": {
+          "title": "The logshipper Schema",
+          "type": "object",
+          "required": [
+            "limits",
+            "requests"
+          ],
+          "properties": {
+            "limits": {
+              "title": "The limits Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            },
+            "requests": {
+              "title": "The requests Schema",
+              "type": "object",
+              "required": [
+                "memory",
+                "cpu",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "initdb": {
+          "title": "The initdb Schema",
+          "type": "object",
+          "required": [
+            "requests",
+            "limits"
+          ],
+          "properties": {
+            "requests": {
+              "title": "The requests Schema",
+              "type": "object",
+              "required": [
+                "cpu",
+                "memory",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            },
+            "limits": {
+              "title": "The limits Schema",
+              "type": "object",
+              "required": [
+                "cpu",
+                "memory",
+                "ephemeral-storage"
+              ],
+              "properties": {
+                "cpu": {
+                  "title": "The cpu Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                },
+                "memory": {
+                  "title": "The memory Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                },
+                "ephemeral-storage": {
+                  "title": "The ephemeral-storage Schema",
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "integer" }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "probes": {
+      "title": "The probes Schema",
+      "type": "object",
+      "required": [
+        "eric-oss-app-onboarding",
+        "logshipper"
+      ],
+      "properties": {
+        "eric-oss-app-onboarding": {
+          "title": "The eric-oss-app-onboarding Schema",
+          "type": "object",
+          "required": [
+            "readinessProbe",
+            "livenessProbe"
+          ],
+          "properties": {
+            "readinessProbe": {
+              "title": "The readinessProbe Schema",
+              "type": "object",
+              "required": [
+                "initialDelaySeconds",
+                "periodSeconds",
+                "timeoutSeconds",
+                "failureThreshold",
+                "successThreshold"
+              ],
+              "properties": {
+                "initialDelaySeconds": {
+                  "title": "The initialDelaySeconds Schema",
+                  "type": "number"
+                },
+                "periodSeconds": {
+                  "title": "The periodSeconds Schema",
+                  "type": "number"
+                },
+                "timeoutSeconds": {
+                  "title": "The timeoutSeconds Schema",
+                  "type": "number"
+                },
+                "failureThreshold": {
+                  "title": "The failureThreshold Schema",
+                  "type": "number"
+                },
+                "successThreshold": {
+                  "title": "The successThreshold Schema",
+                  "type": "number"
+                }
+              }
+            },
+            "livenessProbe": {
+              "title": "The livenessProbe Schema",
+              "type": "object",
+              "required": [
+                "initialDelaySeconds",
+                "periodSeconds",
+                "timeoutSeconds",
+                "failureThreshold",
+                "successThreshold"
+              ],
+              "properties": {
+                "initialDelaySeconds": {
+                  "title": "The initialDelaySeconds Schema",
+                  "type": "number"
+                },
+                "periodSeconds": {
+                  "title": "The periodSeconds Schema",
+                  "type": "number"
+                },
+                "timeoutSeconds": {
+                  "title": "The timeoutSeconds Schema",
+                  "type": "number"
+                },
+                "failureThreshold": {
+                  "title": "The failureThreshold Schema",
+                  "type": "number"
+                },
+                "successThreshold": {
+                  "title": "The successThreshold Schema",
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "logshipper": {
+          "title": "The logshipper Schema",
+          "type": "object",
+          "required": [
+            "livenessProbe",
+            "readinessProbe"
+          ],
+          "properties": {
+            "livenessProbe": {
+              "title": "The livenessProbe Schema",
+              "type": "object",
+              "required": [
+                "initialDelaySeconds",
+                "timeoutSeconds",
+                "periodSeconds",
+                "successThreshold",
+                "failureThreshold"
+              ],
+              "properties": {
+                "initialDelaySeconds": {
+                  "title": "The initialDelaySeconds Schema",
+                  "type": "number"
+                },
+                "timeoutSeconds": {
+                  "title": "The timeoutSeconds Schema",
+                  "type": "number"
+                },
+                "periodSeconds": {
+                  "title": "The periodSeconds Schema",
+                  "type": "number"
+                },
+                "successThreshold": {
+                  "title": "The successThreshold Schema",
+                  "type": "number"
+                },
+                "failureThreshold": {
+                  "title": "The failureThreshold Schema",
+                  "type": "number"
+                }
+              }
+            },
+            "readinessProbe": {
+              "title": "The readinessProbe Schema",
+              "type": "object",
+              "required": [
+                "initialDelaySeconds",
+                "timeoutSeconds",
+                "periodSeconds",
+                "successThreshold",
+                "failureThreshold"
+              ],
+              "properties": {
+                "initialDelaySeconds": {
+                  "title": "The initialDelaySeconds Schema",
+                  "type": "number"
+                },
+                "timeoutSeconds": {
+                  "title": "The timeoutSeconds Schema",
+                  "type": "number"
+                },
+                "periodSeconds": {
+                  "title": "The periodSeconds Schema",
+                  "type": "number"
+                },
+                "successThreshold": {
+                  "title": "The successThreshold Schema",
+                  "type": "number"
+                },
+                "failureThreshold": {
+                  "title": "The failureThreshold Schema",
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "autoScaling": {
+      "title": "The autoScaling Schema",
+      "type": "object",
+      "required": [
+        "enabled",
+        "minReplicas",
+        "maxReplicas",
+        "targetCPUUtilizationPercentage"
+      ],
+      "properties": {
+        "enabled": {
+          "title": "The enabled Schema",
+          "type": "boolean"
+        },
+        "minReplicas": {
+          "title": "The minReplicas Schema",
+          "type": "number"
+        },
+        "maxReplicas": {
+          "title": "The maxReplicas Schema",
+          "type": "number"
+        },
+        "targetCPUUtilizationPercentage": {
+          "title": "The targetCPUUtilizationPercentage Schema",
+          "type": "number"
+        }
+      }
+    },
+    "nodeSelector": {
+      "title": "The nodeSelector Schema",
+      "type": "object",
+      "required": [
+        "hooklauncher",
+        "onboarding"
+      ],
+      "properties": {
+        "hooklauncher": {
+          "title": "The hooklauncher Schema",
+          "type": "object",
+          "required": [],
+          "properties": {}
+        },
+        "onboarding": {
+          "title": "The onboarding Schema",
+          "type": "object",
+          "required": [],
+          "properties": {}
+        }
+      }
+    },
+    "topologySpreadConstraints": {
+      "title": "The topologySpreadConstraints Schema",
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "tolerations": {
+      "title": "The tolerations Schema",
+      "type": "array",
+      "items": {}
+    },
+    "affinity": {
+      "title": "The affinity Schema",
+      "type": "object",
+      "required": [
+        "podAntiAffinity"
+      ],
+      "properties": {
+        "podAntiAffinity": {
+          "title": "The podAntiAffinity Schema",
+          "type": "string"
+        }
+      }
+    },
+    "terminationGracePeriodSeconds": {
+      "title": "The terminationGracePeriodSeconds Schema",
+      "type": "number"
+    },
+    "helmReg": {
+      "title": "The helmReg Schema",
+      "type": "object",
+      "required": [
+        "tmpDir",
+        "url",
+        "secret"
+      ],
+      "properties": {
+        "tmpDir": {
+          "title": "The tmpDir Schema",
+          "type": "string"
+        },
+        "url": {
+          "title": "The url Schema",
+          "type": "string"
+        },
+        "secret": {
+          "title": "The secret Schema",
+          "type": "string"
+        }
+      }
+    },
+    "persistence": {
+      "title": "The persistence Schema",
+      "type": "object",
+      "required": [
+        "persistentVolumeClaim"
+      ],
+      "properties": {
+        "persistentVolumeClaim": {
+          "title": "The persistentVolumeClaim Schema",
+          "type": "object",
+          "required": [
+            "size",
+            "storageConnectivity"
+          ],
+          "properties": {
+            "size": {
+              "title": "The size Schema",
+              "type": "string"
+            },
+            "storageConnectivity": {
+              "title": "The storageConnectivity Schema",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "contReg": {
+      "title": "The contReg Schema",
+      "type": "object",
+      "required": [
+        "url",
+        "secret"
+      ],
+      "properties": {
+        "url": {
+          "title": "The url Schema",
+          "type": "string"
+        },
+        "secret": {
+          "title": "The secret Schema",
+          "type": "string"
+        }
+      }
+    },
+    "app-lcm": {
+      "title": "The app-lcm Schema",
+      "type": "object",
+      "required": [
+        "service"
+      ],
+      "properties": {
+        "service": {
+          "title": "The service Schema",
+          "type": "object",
+          "required": [
+            "hostname",
+            "port"
+          ],
+          "properties": {
+            "hostname": {
+              "title": "The hostname Schema",
+              "type": "string"
+            },
+            "port": {
+              "title": "The port Schema",
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "eric-data-document-db": {
+      "title": "The eric-data-document-db Schema",
+      "type": "object",
+      "required": [
+        "driver",
+        "name",
+        "port",
+        "onboardingPgDatabase",
+        "appmgrPgDatabase",
+        "credentials",
+        "originalAppOnboardingDb"
+      ],
+      "properties": {
+        "driver": {
+          "title": "The driver Schema",
+          "type": "string"
+        },
+        "name": {
+          "title": "The name Schema",
+          "type": "string"
+        },
+        "port": {
+          "title": "The port Schema",
+          "type": "number"
+        },
+        "onboardingPgDatabase": {
+          "title": "The onboardingPgDatabase Schema",
+          "type": "string"
+        },
+        "appmgrPgDatabase": {
+          "title": "The appmgrPgDatabase Schema",
+          "type": "string"
+        },
+        "credentials": {
+          "title": "The credentials Schema",
+          "type": "object",
+          "required": [
+            "kubernetesSecretName"
+          ],
+          "properties": {
+            "kubernetesSecretName": {
+              "title": "The kubernetesSecretName Schema",
+              "type": "string"
+            }
+          }
+        },
+        "originalAppOnboardingDb": {
+          "title": "The originalAppOnboardingDb Schema",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "title": "The name Schema",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "pythonJob": {
+      "title": "The pythonJob Schema",
+      "type": "object",
+      "required": [
+        "image",
+        "activeDeadlineSeconds",
+        "ttlSecondsAfterFinished",
+        "pythonJobPollingTime"
+      ],
+      "properties": {
+        "image": {
+          "title": "The image Schema",
+          "type": "string"
+        },
+        "activeDeadlineSeconds": {
+          "title": "The activeDeadlineSeconds Schema",
+          "type": "number"
+        },
+        "ttlSecondsAfterFinished": {
+          "title": "The ttlSecondsAfterFinished Schema",
+          "type": "number"
+        },
+        "pythonJobPollingTime": {
+          "title": "The pythonJobPollingTime Schema",
+          "type": "number"
+        }
+      }
+    },
+    "cron": {
+      "title": "The cron Schema",
+      "type": "object",
+      "required": [
+        "fetchRate"
+      ],
+      "properties": {
+        "fetchRate": {
+          "title": "The fetchRate Schema",
+          "type": "string"
+        }
+      }
+    },
+    "artifactRegistryRetry": {
+      "title": "The artifactRegistryRetry Schema",
+      "type": "object",
+      "required": [
+        "delay",
+        "maxAttempts"
+      ],
+      "properties": {
+        "delay": {
+          "title": "The delay Schema",
+          "type": "number"
+        },
+        "maxAttempts": {
+          "title": "The maxAttempts Schema",
+          "type": "number"
+        }
+      }
+    },
+    "bandwidth": {
+      "title": "The bandwidth Schema",
+      "type": "object",
+      "required": [
+        "hooklauncher"
+      ],
+      "properties": {
+        "hooklauncher": {
+          "title": "The hooklauncher Schema",
+          "type": "object",
+          "properties": {
+            "maxEgressRate": {
+              "title": "The maxEgressRate Schema"
+            }
+          }
+        }
+      }
+    },
+    "serviceMesh": {
+      "title": "The serviceMesh Schema",
+      "type": "object",
+      "required": [
+        "userVolume",
+        "userVolumeMount"
+      ],
+      "properties": {
+        "userVolume": {
+          "title": "The userVolume Schema",
+          "type": "string"
+        },
+        "userVolumeMount": {
+          "title": "The userVolumeMount Schema",
+          "type": "string"
+        }
+      }
+    },
+    "log": {
+      "title": "The log Schema",
+      "type": "object",
+      "required": [],
+      "properties": {
+        "streamingMethod": {
+          "title": "The streamingMethod Schema"
+        }
+      }
+    },
+    "logShipper": {
+      "title": "The logShipper Schema",
+      "type": "object",
+      "required": [
+        "logLevel",
+        "storage",
+        "output",
+        "input"
+      ],
+      "properties": {
+        "logLevel": {
+          "title": "The logLevel Schema",
+          "type": "string"
+        },
+        "storage": {
+          "title": "The storage Schema",
+          "type": "object",
+          "required": [
+            "path",
+            "size"
+          ],
+          "properties": {
+            "path": {
+              "title": "The path Schema",
+              "type": "string"
+            },
+            "size": {
+              "title": "The size Schema",
+              "type": "string"
+            }
+          }
+        },
+        "output": {
+          "title": "The output Schema",
+          "type": "object",
+          "required": [
+            "logtransformer"
+          ],
+          "properties": {
+            "logtransformer": {
+              "title": "The logtransformer Schema",
+              "type": "object",
+              "required": [
+                "host"
+              ],
+              "properties": {
+                "host": {
+                  "title": "The host Schema",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "input": {
+          "title": "The input Schema",
+          "type": "object",
+          "required": [
+            "files"
+          ],
+          "properties": {
+            "files": {
+              "title": "The files Schema",
+              "type": "array",
+              "required": [
+                "enabled",
+                "paths"
+              ],
+              "properties": {
+                "enabled": {
+                  "title": "The enabled Schema",
+                  "type": "boolean"
+                },
+                "paths": {
+                  "title": "The paths Schema",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "appArmorProfile": {
+      "title": "The appArmorProfile Schema",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "title": "The type Schema",
+          "type": "string"
+        }
+      }
+    },
+    "logShipperPersistence": {
+      "title": "The logShipperPersistence Schema",
+      "type": "object",
+      "required": [
+        "persistentVolumeClaim"
+      ],
+      "properties": {
+        "type": {
+          "title": "The persistentVolumeClaim Schema",
+          "type": "object",
+          "required": [
+            "size",
+            "storageConnectivity"
+          ],
+          "properties": {
+            "size": {
+              "title": "The size Schema",
+              "type": "string"
+            },
+            "storageConnectivity": {
+              "title": "The storageConnectivity Schema",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "seccompProfile": {
+      "title": "The seccompProfile Schema",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "title": "The type Schema",
+          "type": "string"
+        }
+      }
+    },
+    "appPackageExecutor": {
+      "title": "The appPackageExecutor Schema",
+      "type": "object",
+      "required": [
+        "threadsCount",
+        "queueCapacity"
+      ],
+      "properties": {
+        "threadsCount": {
+          "title": "The threadsCount Schema",
+          "type": "number"
+        },
+        "queueCapacity": {
+          "title": "The queueCapacity Schema",
+          "type": "number"
+        }
+      }
+    },
+    "dataAccessRetry": {
+      "title": "Properties for db retries during onboarding execution",
+      "type": "object",
+      "required": [
+        "delay",
+        "maxAttempts"
+      ],
+      "properties": {
+        "delay": {
+          "title": "The delay Schema",
+          "type": "number"
+        },
+        "maxAttempts": {
+          "title": "The maxAttempts Schema",
+          "type": "number"
+        }
+      }
+    },
+    "objectStore": {
+      "title": "The objectStore Schema",
+      "type": "object",
+      "required": [
+        "hostname",
+        "bucketName"
+      ],
+      "properties": {
+        "hostname": {
+          "title": "The hostname Schema",
+          "type": "string"
+        },
+        "bucketName": {
+          "title": "The bucketName Schema",
+          "type": "string"
+        }
+      }
+    },
+    "api-gateway-route": {
+      "title": "The api-gateway-route Schema",
+      "type": "object",
+      "required": [
+        "eric-oss-app-lcm",
+        "eric-oss-app-onboarding"
+      ],
+      "properties": {
+        "eric-oss-app-lcm": {
+          "title": "The eric-oss-app-lcm Schema",
+          "type": "object",
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "size": {
+              "title": "The path Schema",
+              "type": "string"
+            }
+          }
+        },
+        "eric-oss-app-onboarding": {
+          "title": "The eric-oss-app-onboarding Schema",
+          "type": "object",
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "size": {
+              "title": "The path Schema",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "dst": {
+      "title": "The dst Schema",
+      "type": "object",
+      "required": [
+        "enabled",
+        "collector",
+        "producer"
+      ],
+      "properties": {
+        "enabled": {
+          "title": "The enabled Schema",
+          "type": "string"
+        },
+        "collector": {
+          "title": "The collector Schema",
+          "type": "object",
+          "required": [
+            "host",
+            "protocol",
+            "polingInterval",
+            "portOtlpGrpc",
+            "portOtlpHttp",
+            "portJaegerGrpc"
+          ],
+          "properties": {
+            "host": {
+              "title": "The host Schema",
+              "type": "string"
+            },
+            "protocol": {
+              "title": "The protocol Schema",
+              "type": "string"
+            },
+            "polingInterval": {
+              "title": "The polingInterval Schema",
+              "type": "number"
+            },
+            "portOtlpGrpc": {
+              "title": "The portOtlpGrpc Schema",
+              "type": "string"
+            },
+            "portOtlpHttp": {
+              "title": "The portOtlpHttp Schema",
+              "type": "string"
+            },
+            "portJaegerGrpc": {
+              "title": "The portJaegerGrpc Schema",
+              "type": "string"
+            }
+          }
+        },
+        "producer": {
+          "title": "The producer Schema",
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "title": "The type Schema",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

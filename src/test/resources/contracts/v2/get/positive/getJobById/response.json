@@ -1,0 +1,38 @@
+{
+  "id": "9cc1047a-5aae-4630-893a-1536392cbd2b",
+  "fileName": "eric-oss-hello-world-app.csar",
+  "packageVersion": "1.1.0",
+  "packageSize" : "100MiB",
+  "vendor": "Ericsson",
+  "type": "rApp",
+  "status": "ONBOARDED",
+  "onboardStartedAt": "2023-12-20T12:00:06.996762Z",
+  "onboardEndedAt": "2023-12-20T12:00:54.798965Z",
+  "events": [
+    {
+      "type": "INFO",
+      "title": "Stored 1 out of 3 artifacts",
+      "detail": "Uploaded eric-oss-hello-world-app",
+      "occurredAt": "2023-12-20T12:00:47.937804Z"
+    },
+    {
+      "type": "INFO",
+      "title": "Stored 1 out of 3 artifacts",
+      "detail": "Uploaded docker.tar",
+      "occurredAt": "2023-12-20T12:00:48.063780Z"
+    },
+    {
+      "type": "INFO",
+      "title": "Stored 1 out of 3 artifacts",
+      "detail": "Uploaded ASD.yaml",
+      "occurredAt": "2023-12-20T12:00:48.110092Z"
+    }
+  ],
+  "app": {
+    "id": "61db75f4-89dc-41b8-b597-a0979d85eb58",
+    "href": "app-lifecycle-management/v3/apps/61db75f4-89dc-41b8-b597-a0979d85eb58"
+  },
+  "self": {
+    "href": "app-onboarding/v2/onboarding-jobs/9cc1047a-5aae-4630-893a-1536392cbd2b"
+  }
+}

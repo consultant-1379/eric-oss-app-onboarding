@@ -1,0 +1,379 @@
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+# Default values for eric-oss-app-onboarding.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# DR-D1121-011: Do not define default values for global Helm parameters in each microservice
+# global:
+#  timezone: UTC
+#  registry:
+#    url: armdocker.rnd.ericsson.se
+#    imagePullPolicy: IfNotPresent
+#  #Secret must be manually created in the namespace, no default value
+#  pullSecret: k8s-registry-secret
+#  fsGroup:
+#    manual: 10000
+#    namespace: true
+# DR-D1123-135: Configuration of supplementalGroups IDs
+#  podSecurityContext:
+#    supplementalGroups:
+#  # The IP family the service belongs to when service.type is set to ClusterIP.
+#  # Options are: IPv4, IPv6
+#  internalIPFamily:
+#  nodeSelector:
+#  security:
+#    policyBinding:
+#      create: true
+#    policyReferenceMap:
+#      default-restricted-security-policy: "<restricted security policy at customer deployment>"
+#    tls:
+#      enabled: true
+#  # Configuring global streamingMethod: indirect, direct, dual. default=direct
+#  log:
+#    streamingMethod: "indirect"
+#  logShipper:
+#    config:
+#      image:
+#        repoPath: "proj-adp-log-released"
+#        registry: "armdocker.rnd.ericsson.se"
+#  eric-oss-app-onboarding-stub:
+#    enabled: true
+#  tolerations: []
+
+# Needed for DR-D1123-134
+securityPolicy:
+  rolename: "eric-oss-app-onboarding"
+
+# DR-D1123-135: Configuration of supplementalGroups IDs
+podSecurityContext:
+  supplementalGroups:
+
+networkPolicy:
+    enabled: true
+
+replicaCount: 2
+
+podDisruptionBudget:
+  # Minimum number/percentage of Pods that must remain available during the planned disruption.
+  # Value can be expressed as an integer or as a percentage. When specified as a percentage of the Pods,
+  # if it does not map to an exact number, Kubernetes rounds up to the nearest integer.
+  # minAvailable: 2 # example value for 2 pods defined as integer
+  minAvailable: "40%"
+
+hooklauncher:
+  cleanup: "true"
+  terminateEarlyOnFailure: "true"
+  backoffLimit: 3
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+
+#Empty labels list for application deployment engineer to add more labels (In Compliance with DR-D1121-068).
+labels: { }
+
+imageCredentials:
+  repoPath:
+  eric-oss-app-onboarding:
+    repoPath: # see default in eric-product-info.yaml
+    registry:
+      imagePullPolicy:
+      # overrides global registry url
+      url:
+      #- Secret must be manually created in the namespace, no default value
+    pullSecret:
+  eric-oss-app-onboardingTest:
+    repoPath: # see default in eric-product-info.yaml
+    pullSecret:
+  hooklauncher:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+  kubeclient:
+    registry:
+      url:
+      imagePullPolicy:
+    repoPath:
+
+#imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: { }
+
+podPriority:
+  eric-oss-app-onboarding:
+    priorityClassName: ""
+  hooklauncher:
+    priorityClassName: ""
+
+annotations: { }
+
+service:
+  type: ClusterIP
+  port: 8080    # Changed from 80 to 8080 and spring application is hosted on 8080
+  endpoints:
+    chassisapi:
+      tls:
+        enforced: required
+        verifyClientCertificate: required
+
+ingress:
+  enabled: false
+  ingressClass: OAM-IngressClass
+  hosts:
+    - host: chart-example.local
+      paths: [ / ]
+
+  tls: {}
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+eric-pm-server:
+  rbac:
+    appMonitoring:
+      enabled: true
+
+prometheus:
+  path: /actuator/prometheus
+  scrape: true
+  role: service
+  interval: 15s
+
+resources:
+  eric-oss-app-onboarding:
+    requests:
+      memory: 1Gi
+      cpu: 100m
+      ephemeral-storage: ""
+    limits:
+      memory: 1.5Gi
+      cpu: 750m
+      ephemeral-storage: ""
+  eric-oss-app-onboardingTest:
+    requests:
+      memory: 128Mi
+      cpu: 50m
+      ephemeral-storage: ""
+    limits:
+      memory: 1Gi
+      cpu: 256m
+      ephemeral-storage: ""
+  hooklauncher:
+    requests:
+      memory: "50Mi"
+      cpu: "50m"
+      ephemeral-storage: "100Mi"
+    limits:
+      memory: "100Mi"
+      cpu: "100m"
+      ephemeral-storage: "100Mi"
+  logshipper:
+    limits:
+      memory: 100Mi
+      cpu: 100m
+      ephemeral-storage: ""
+    requests:
+      memory: 50Mi
+      cpu: 50m
+      ephemeral-storage: ""
+  initdb:
+    requests:
+      cpu: "10m"
+      memory: "50Mi"
+      ephemeral-storage: ""
+    limits:
+      cpu: "50m"
+      memory: "100Mi"
+      ephemeral-storage: ""
+
+probes:
+  eric-oss-app-onboarding:
+    readinessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 15
+      timeoutSeconds: 10
+      failureThreshold: 3
+      successThreshold: 3
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 15
+      timeoutSeconds: 10
+      failureThreshold: 3
+      successThreshold: 3
+  logshipper:
+    livenessProbe:
+      initialDelaySeconds: 300
+      timeoutSeconds: 15
+      periodSeconds: 30
+      successThreshold: 1
+      failureThreshold: 3
+    readinessProbe:
+      initialDelaySeconds: 30
+      timeoutSeconds: 15
+      periodSeconds: 30
+      successThreshold: 1
+      failureThreshold: 3
+
+autoScaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector:
+  hooklauncher: {}
+  onboarding: {}
+
+topologySpreadConstraints: { }
+tolerations: []
+
+affinity:
+  podAntiAffinity: "hard"
+  topologyKey: "kubernetes.io/hostname"
+
+terminationGracePeriodSeconds: 30
+
+helmReg:
+  tmpDir: /tmp
+  url: http://eric-lcm-helm-chart-registry:8080
+  secret: eric-lcm-helm-chart-registry
+
+persistence:
+  persistentVolumeClaim:
+    size: 15Gi
+    storageConnectivity: Filesystem
+
+contReg:
+  url: http://eric-lcm-container-registry-registry:5000
+  secret: eric-oss-app-mgr-container-registry-secret
+
+app-lcm:
+  service:
+    hostname: eric-oss-app-lcm
+    port: 8080
+
+eric-data-document-db:
+  driver: org.postgresql.Driver
+  name: eric-appmgr-data-document-db
+  port: 5432
+  onboardingPgDatabase: onboarding
+  appmgrPgDatabase: postgres
+  credentials:
+    kubernetesSecretName: eric-appmgr-data-document-db-credentials
+  originalAppOnboardingDb:
+    name: eric-oss-app-onboarding-pg
+
+pythonJob:
+  image: proj-eric-oss-drop/eric-oss-app-onboarding/python-job-image:PYTHON_VERSION
+  activeDeadlineSeconds: 3900
+  ttlSecondsAfterFinished: 300
+  pythonJobPollingTime: 3600
+
+cron:
+  fetchRate: "86400000"
+
+dataCleanup:
+  schedule:
+    fixedRate: "600000"
+
+artifactRegistryRetry:
+  delay: 1000
+  maxAttempts: 3
+
+bandwidth:
+  hooklauncher:
+    maxEgressRate:
+serviceMesh:
+  userVolume: '{"app-onboarding-appmgr-data-pg-db-certs-tls":{"secret":{"secretName":"eric-oss-app-onboarding-data-pg-db-secret","optional":true}},"eric-oss-app-onboarding-helm-chart-reg-certs-tls":{"secret":{"secretName":"eric-oss-app-onboarding-eric-lcm-helm-chart-registry-secret","optional":true}},"eric-oss-app-onboarding-certs-ca-tls":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}},"eric-oss-app-onboarding-eric-lcm-container-registry-tls":{"secret":{"secretName":"eric-oss-app-onboarding-eric-lcm-container-registry-secret","optional":true}}}'
+  userVolumeMount: '{"app-onboarding-appmgr-data-pg-db-certs-tls":{"mountPath":"/etc/istio/tls/appmgr-data-document-db/","readOnly":true},"eric-oss-app-onboarding-helm-chart-reg-certs-tls":{"mountPath":"/etc/istio/tls/eric-lcm-helm-chart-registry","readOnly":true},"eric-oss-app-onboarding-certs-ca-tls":{"mountPath":"/etc/istio/tls-ca","readOnly":true},"eric-oss-app-onboarding-eric-lcm-container-registry-tls":{"mountPath":"/etc/istio/tls/eric-lcm-container-registry","readOnly":true}}'
+
+log:
+  # local streamingMethod
+  streamingMethod:
+
+logShipper:
+  logLevel: "info"
+  output:
+    logtransformer:
+      host: eric-log-transformer
+  input:
+    files:
+      - enabled: true
+        paths:
+          - "jobs/python-jobs.log"
+  storage:
+    path: "/logs"
+    size: "500Mi"
+
+logShipperPersistence:
+  persistentVolumeClaim:
+    size: 500Mi
+    storageConnectivity: Filesystem
+
+appArmorProfile:
+  type: ""
+
+seccompProfile:
+  type: ""
+
+appPackageExecutor:
+  threadsCount: 5
+  queueCapacity: 5
+
+objectStore:
+  hostname: eric-data-object-storage-mn
+  bucketName: app-management
+  bucketCheckRetry:
+    delay: 60000
+    maxAttempts: 60
+
+api-gateway-route:
+  eric-oss-app-lcm:
+    path: app-lifecycle-management
+  eric-oss-app-onboarding:
+    path: app-onboarding
+
+dataAccessRetry:
+  delay: 20000
+  maxAttempts: 7
+
+# Distributed Systems Tracing
+dst:
+  enabled: "true"
+  collector:
+    host: "http://eric-dst-collector"
+    protocol: "grpc"
+    polingInterval: 30
+    portOtlpGrpc: "4317"
+    portOtlpHttp: "4318"
+    portJaegerGrpc: "14250"
+  producer:
+    type: B3,W3C

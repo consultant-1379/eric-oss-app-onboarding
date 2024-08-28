@@ -1,0 +1,114 @@
+{{- $stubEnabled := include "eric-oss-app-onboarding.app-onboarding-stub-enabled" . | trim -}}
+{{- if eq (include "eric-oss-app-onboarding.app-onboarding-stub-enabled" .) "true" }}
+
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ template "eric-oss-app-onboarding.name" . }}-test
+  labels:
+{{- include "eric-oss-app-onboarding.labels" . | nindent 4 }}
+  annotations:
+{{- include "eric-oss-app-onboarding.annotations" . | nindent 4 }}
+    "helm.sh/hook": test-success
+spec:
+  {{- if (index .Values "podPriority" "eric-oss-app-onboarding" "priorityClassName") }}
+  priorityClassName: {{index .Values "podPriority" "eric-oss-app-onboarding" "priorityClassName" | quote}}
+  {{- end }}
+  {{- if include "eric-oss-app-onboarding.pullSecret" . }}
+  imagePullSecrets:
+    - name: {{ include "eric-oss-app-onboarding.pullSecret" . | quote}}
+  {{- end }}
+  securityContext:
+    fsGroup: {{ include "eric-oss-app-onboarding.fsGroup.coordinated" . }}
+  containers:
+  - name: eric-oss-app-onboarding-test
+    image: {{ template "eric-oss-app-onboarding.testImagePath" . }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+      capabilities:
+          drop:
+            - all
+    resources:
+      requests:
+      {{- if (index .Values "resources" "eric-oss-app-onboardingTest" "requests" "cpu") }}
+        cpu: {{ (index .Values "resources" "eric-oss-app-onboardingTest" "requests" "cpu" | quote) }}
+      {{- end }}
+      {{- if (index .Values "resources" "eric-oss-app-onboardingTest" "requests" "memory") }}
+        memory: {{ (index .Values "resources" "eric-oss-app-onboardingTest" "requests" "memory" | quote) }}
+      {{- end }}
+      {{- if (index .Values "resources" "eric-oss-app-onboardingTest" "requests" "ephemeral-storage") }}
+      {{ println "  ephemeral-storage:" (index .Values "resources" "eric-oss-app-onboardingTest" "requests" "ephemeral-storage" | quote) }}
+      {{- end }}
+      limits:
+      {{- if (index .Values "resources" "eric-oss-app-onboardingTest" "limits" "cpu") }}
+        cpu: {{ (index .Values "resources" "eric-oss-app-onboardingTest" "limits" "cpu" | quote) }}
+      {{- end }}
+      {{- if (index .Values "resources" "eric-oss-app-onboardingTest" "limits" "memory") }}
+        memory: {{ (index .Values "resources" "eric-oss-app-onboardingTest" "limits" "memory" | quote) }}
+      {{- end }}
+      {{- if (index .Values "resources" "eric-oss-app-onboardingTest" "limits" "ephemeral-storage") }}
+      {{ println "  ephemeral-storage:" (index .Values "resources" "eric-oss-app-onboardingTest" "limits" "ephemeral-storage" | quote) }}
+      {{- end }}
+    env:
+      - name: SERVICE_HOSTNAME
+        value: {{ template "eric-oss-app-onboarding.name" . }}
+      - name: SERVICE_PORT
+        value: "8080"
+    command: [ "/bin/sh", "-c", "status=$(curl --silent --output /dev/null -w '%{http_code}' --connect-timeout 20 http://$SERVICE_HOSTNAME:$SERVICE_PORT/actuator/health) && if [[ $status -eq 200 ]]; then exit 0; else exit 1; fi" ]
+  restartPolicy: Never
+  nodeSelector: {{ include "eric-oss-app-onboarding.nodeSelector" . | nindent 2 -}}
+  {{- if ne (len (include "eric-oss-app-onboarding.tolerations" .)) 0 }}
+  tolerations:
+    {{- include "eric-oss-app-onboarding.tolerations" . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.topologySpreadConstraints }}
+  topologySpreadConstraints:
+    {{- toYaml . | nindent 6 }}
+  {{- end }}
+  {{- if eq .Values.affinity.podAntiAffinity "hard" }}
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - {{ include "eric-oss-app-onboarding.name" . }}
+        topologyKey: "kubernetes.io/hostname"
+  {{- else if eq .Values.affinity.podAntiAffinity  "soft" }}
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - {{ include "eric-oss-app-onboarding.name" . }}
+          topologyKey: "kubernetes.io/hostname"
+  {{- end }}
+  terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+{{- end }}

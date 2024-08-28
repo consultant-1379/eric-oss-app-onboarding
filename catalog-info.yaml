@@ -1,0 +1,101 @@
+#
+# COPYRIGHT Ericsson 2024
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: eric-oss-app-onboarding
+  title: App Onboarding
+  description: "App Onboarding is a microservice that onboards Automation App packages in CSAR format based on the ORAN standards."
+  annotations:
+    backstage.io/source-location: url:https://gerrit-gamma.gic.ericsson.se/plugins/gitiles/OSS/com.ericsson.oss.ae/eric-oss-app-onboarding
+    backstage.io/kubernetes-label-selector: 'app.kubernetes.io/name=eric-oss-app-onboarding'
+    backstage.io/techdocs-ref: dir:.
+    gerrit/component: OSS/com.ericsson.oss.ae/eric-oss-app-onboarding
+    sonarqube.org/project-key: com.ericsson.oss.ae:eric-oss-app-onboarding
+    jira.com/project-keys: IDUN
+    jira.com/filter-ids: "229225"
+    jenkins:
+      fem6s11-eiffel216.eiffel.gic.ericsson.se:8443/eric-oss-app-onboarding_PreCodeReview_Hybrid/,
+      fem6s11-eiffel216.eiffel.gic.ericsson.se:8443/eric-oss-app-onboarding_Publish_Hybrid/
+    spinnaker.io/application-name: app-mgr-e2e-cicd
+    spinnaker.io/pipelines: eric-oss-app-onboarding-E2E-Flow
+  links:
+    - url: https://mimer.internal.ericsson.com/productPage?activeView=productDetails&productNumber=APR201534
+      title: Mimer
+      icon: dashboard
+    - url: https://eteamspace.internal.ericsson.com/display/IDUN/Team+Rhapsody
+      title: Team Rhapsody Confluence
+      icon: dashboard
+    - url: https://eteamspace.internal.ericsson.com/display/IDUN/Team+Saga
+      title: Team Saga Confluence
+      icon: dashboard
+    - url: https://adp.ericsson.se/marketplace/app-onboarding
+      title: ADP
+      icon: dashboard
+  tags:
+    - ericsson-intelligent-controller
+  roles:
+    product-owner: ekmauhr
+    microservice-architect: ezarnol
+    line-manager: esunbal
+    scrum-master: ekurree
+    security-master: elvelai
+  approval:
+    date: 12-03-24
+    approver: epagrac
+
+spec:
+  system: app-management
+  lifecycle: production
+  owner: team-rhapsody
+  type: microservice
+  providesApis:
+    - app-onboarding-api-v1
+    - app-onboarding-api-v2
+  dependsOn: 
+    - component:eric-appmgr-data-document-db
+    - component:eric-data-object-storage-mn
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: app-onboarding-api-v1
+  title: App Onboarding API V1
+  description: App Onboarding API V1
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-rhapsody
+  system: app-management
+  definition:
+   $text: https://gerrit-gamma.gic.ericsson.se/plugins/gitiles/OSS/com.ericsson.oss.ae/eric-oss-app-onboarding/+/refs/heads/master/src/main/resources/v1/eric-oss-app-onboarding-openapi.yaml
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: app-onboarding-api-v2
+  title: App Onboarding API V2
+  description: App Onboarding API V2
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-rhapsody
+  system: app-management
+  definition:
+    $text: https://gerrit-gamma.gic.ericsson.se/plugins/gitiles/OSS/com.ericsson.oss.ae/eric-oss-app-onboarding/+/refs/heads/master/src/main/resources/v2/eric-oss-app-onboarding-openapi.yaml

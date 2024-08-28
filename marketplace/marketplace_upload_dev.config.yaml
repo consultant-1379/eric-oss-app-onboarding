@@ -1,0 +1,17 @@
+version: indevelopment
+documents:
+  - name: "Application Developers Guide"
+    filepath: ./.bob/build/doc/html/app-dev-guide.zip
+  - name: "User Guide"
+    filepath: ./.bob/build/doc/html/user-guide.zip
+  - name: 'API Documentation'
+    filepath: src/main/resources/v1/index.html
+  - name: "Product Release Information"
+    filepath: ./.bob/build/doc/html/pri.zip
+  - name: "Software Vendor List"
+    filepath: ./.bob/build/doc/html/software-vendor-list.zip
+  - name: "Test Specification"
+    external-link: "https://erilink.ericsson.se/eridoc/erl/objectId/09004cffc931a0d4?docno=6/1790-4/FCP1332126Uen&action=current&format=msw12"
+    restricted: true
+  - name: "Test Report"
+    filepath: ./.bob/build/doc/html/test-report.zip

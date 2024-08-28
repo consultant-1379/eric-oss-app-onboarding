@@ -1,0 +1,72 @@
+@page {
+  size: 27cm 36cm;
+  margin: 2cm;
+}
+body {
+  margin: auto;
+  width: 80%;
+  padding: 0px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ddd;
+  max-width: 100%;
+}
+th, td {
+  text-align: left;
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 10px;
+}
+tr:nth-child(even){background-color: #F2F2F2}
+th {
+  background-color: #3374FF;
+  color: white;
+}
+pre, code {
+  border: 1px solid #ddd;
+  background: #D1DFFA;
+  word-wrap: break-word;
+  white-space: pre-wrap;       /* css-3 */
+  font-size: 10px;
+}
+body {
+       counter-reset: h2counter;
+   }
+   h1 {
+       counter-reset: h2counter;
+   }
+   h2 {
+    counter-reset: h3counter;
+   }
+   h3 {
+    counter-reset: h4counter;
+   }
+   h4 {
+    counter-reset: h5counter;
+   }
+   h5 {
+    counter-reset: h6counter;
+   }
+   h2:before {
+       content: counter(h2counter) ".\0000a0\0000a0";
+       counter-increment: h2counter;
+   }
+   h3:before {
+       content: counter(h2counter) "." counter(h3counter) ".\0000a0\0000a0";
+       counter-increment: h3counter;
+   }
+   h4:before {
+       content: counter(h2counter) "." counter(h3counter) "." counter(h4counter) ".\0000a0\0000a0";
+       counter-increment: h4counter;
+   }
+   h5:before {
+       content: counter(h2counter) "." counter(h3counter) "." counter(h4counter) "." counter(h5counter) ".\0000a0\0000a0";
+       counter-increment: h5counter;
+   }
+   h6:before {
+       content: counter(h2counter) "." counter(h3counter) "." counter(h4counter) "." counter(h5counter) "." counter(h6counter) ".\0000a0\0000a0";
+       counter-increment: h6counter;
+   }

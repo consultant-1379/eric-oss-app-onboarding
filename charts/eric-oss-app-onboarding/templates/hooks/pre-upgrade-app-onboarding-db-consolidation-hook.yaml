@@ -1,0 +1,116 @@
+{{- if .Release.IsUpgrade -}}
+
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "eric-oss-app-onboarding.name" . }}-db-consolidation-hook
+  labels:
+    {{- include "eric-oss-app-onboarding.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-9"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    {{- include "eric-oss-app-onboarding.annotations" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      {{- if include "eric-oss-app-onboarding.pullSecret" . }}
+      imagePullSecrets:
+        - name: {{ include "eric-oss-app-onboarding.pullSecret" . | quote }}
+      {{- end }}
+      restartPolicy: Never
+      nodeSelector: {{ include "eric-oss-app-onboarding.nodeSelector" . | nindent 6 -}}
+      {{- if ne (len (include "eric-oss-app-onboarding.tolerations" .)) 0 }}
+      tolerations:
+        {{- include "eric-oss-app-onboarding.tolerations" . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "eric-oss-app-onboarding.fullname" . }}
+      securityContext:
+        fsGroup: {{ include "eric-oss-app-onboarding.fsGroup.coordinated" . }}
+      containers:
+        {{ $dbConfig := index .Values "eric-data-document-db" }}
+        - name: {{ template "eric-oss-app-onboarding.name" . }}-db-consolidation-hook-container
+          image: {{ template "eric-oss-app-onboarding.kubeclientImage" . }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c", "/scripts/app-onboarding-db-consolidation.sh"]
+          env:
+            - name: PGHOST
+              value: {{ $dbConfig.name }}
+            - name: PGPORT
+              value: {{ $dbConfig.port | quote }}
+            - name: PGDATABASE
+              value: {{ $dbConfig.appmgrPgDatabase | quote }}
+            - name: APPONBOARDINGPGDATABASE
+              value: {{ $dbConfig.onboardingPgDatabase }}
+            - name: APPONBOARDINGPGHOST
+              value: {{ $dbConfig.originalAppOnboardingDb.name }}
+          {{- if (eq (include "eric-oss-app-onboarding.global-security-tls-enabled" .) "true") }}
+            - name: PGSSLMODE
+              value: verify-full
+            - name: PGSSLCERT
+              value: /opt/mtls/cert/clicert.pem
+            - name: PGSSLKEY
+              value: /opt/mtls/cert/cliprivkey.pem
+            - name: PGSSLROOTCERT
+              value: /opt/mtls/ca/cacertbundle.pem
+            - name: PGUSER
+              value: postgres
+          {{- else }}
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $dbConfig.credentials.kubernetesSecretName }}
+                  key: super-user
+          {{- end }}
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $dbConfig.credentials.kubernetesSecretName }}
+                  key: super-pwd
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+          {{- if (eq (include "eric-oss-app-onboarding.global-security-tls-enabled" .) "true") }}
+            - name: init-cert
+              mountPath: /opt/mtls/cert
+              readOnly: true
+            - name: init-sip-tls-ca
+              mountPath: /opt/mtls/ca
+              readOnly: true
+          {{- end }}
+      volumes:
+      {{ $dbConfig := index .Values "eric-data-document-db" }}
+        - name: scripts
+          configMap:
+            name: {{ template "eric-oss-app-onboarding.name" . }}-db-consolidation-script
+            defaultMode: 0777
+        {{- if (eq (include "eric-oss-app-onboarding.global-security-tls-enabled" .) "true") }}
+        - name: init-sip-tls-ca
+          secret:
+            secretName: eric-sec-sip-tls-trusted-root-cert
+            defaultMode: 0440
+            optional: true
+        - name: init-cert
+          secret:
+            secretName: {{ $dbConfig.name }}-postgres-cert
+            defaultMode: 0440
+            optional: true
+        {{- end }}
+{{- end -}}

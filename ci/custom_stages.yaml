@@ -1,0 +1,9 @@
+stage-marker-test:
+  - name: python_test.Jenkinsfile
+stage-marker-helm:
+  - name: helm_install.Jenkinsfile
+  - name: custom_publish.Jenkinsfile
+stage-marker-image:
+  - name: custom_image.Jenkinsfile
+stage-marker-post-parallel:
+  - name: postparallel.Jenkinsfile

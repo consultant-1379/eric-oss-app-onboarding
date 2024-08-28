@@ -1,0 +1,33 @@
+#
+# COPYRIGHT Ericsson 2021
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+{{- if .Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" }}
+apiVersion: policy/v1
+{{- else }}
+apiVersion: policy/v1beta1
+{{- end }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "eric-oss-app-onboarding.name" . }}
+  labels:
+{{- include "eric-oss-app-onboarding.labels" . | nindent 4 }}
+  annotations:
+{{- include "eric-oss-app-onboarding.annotations" . | nindent 4 }}
+spec:
+  minAvailable: {{ template "eric-oss-app-onboarding.pod-disruption-budget" . }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "eric-oss-app-onboarding.name" . }}

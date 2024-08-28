@@ -1,0 +1,91 @@
+/*******************************************************************************
+* COPYRIGHT Ericsson 2023
+*
+*
+*
+* The copyright to the computer program(s) herein is the property of
+*
+* Ericsson Inc. The programs may be used and/or copied only with written
+*
+* permission from Ericsson Inc. or in accordance with the terms and
+*
+* conditions stipulated in the agreement/contract under which the
+*
+* program(s) have been supplied.
+ *****************************************************************************/
+
+modelVersion: "2.0"
+flavor: "Generic"
+service:
+  # name of the service:
+  name: "App Onboarding"
+  # Design Country (set on the source products)
+  design_countries:
+   - IE                 # Ireland
+  # Compilation Country (Set on the derivative products)
+  sw_compilation_country: SE
+  # Release responsible
+  release_responsible: BCSDBECH
+  #  Design responsible
+  design_responsible: BCSDBECH
+  # using "Completed" when encryption is not changed compared to previous released version.
+  #  encryption_status: "Completed"
+  # Bookmarks
+  #  bookmark: PRIM
+  # The documents is optional if all eridoc document revisions are set
+  documents:
+    # Read documents revisions from this file
+    # Use munin-adp generate-pri-input and pri.py to generate the file
+    # Relative file path to product_structure.yaml
+  #   import: ../build/documents.yaml                                                # Part of Documentation side
+  # Details of the APR product structure:
+  top_product:
+    alias: ["eric-oss-app-onboarding"]
+    # APR Product Number
+    number: APR 201 534
+    # Description
+    description: "App Onboarding is a microservice that onboards Automation App packages in CSAR format based on the ORAN standards."
+    # Includes
+    includes:
+      # SUSE Licenses
+      - prim: 1/FAL 115 3215
+        rstate: R1A
+      - prim: 3/FAL 115 3215
+        rstate: R1A
+      - prim: 5/FAL 115 3215
+        rstate: R1A
+      - prim: 7/FAL 115 3215
+        rstate: R1A
+  # Details of the Source product structure
+  src_products:
+  # Source Code Product
+    - label: Source
+      number: CAV 101 0147
+  # Details of zero or more derivative product structures, use [] for zero
+  derivative_products:
+  # Label describing the product, must be unique per list item
+    - label: "HELM"
+      number: "CXD 101 363"
+      alias: ["eric-oss-app-onboarding"]
+      derivedFrom:
+        munin: CAV 101 0147
+    - label: "IMAGE"
+      number: "CXU 101 1593"
+      description: "App Onboarding"
+      includes:
+        # Common Base OS
+        - munin: CXC 201 2032
+          version: 5.7.0-34
+          secondPartyProduct: "True"
+        # Common Base OS Repo
+        - munin: CXC 201 2031
+          version: 5.7.0-34
+          secondPartyProduct: "True"
+#      uses_foss:
+#        - dependencies_file: dependencies.yaml                      #  Dependencies YAML
+#        - foss_usage: foss.usage.yaml                               #  FOSS Usage YAML
+#      uses_encryption:
+#        - import: encryptions.yaml                                  #  ENCRYPTIONS YAML
+      derivedFrom:
+        munin: CAV 101 0147
+ 

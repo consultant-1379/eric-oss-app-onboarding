@@ -1,0 +1,108 @@
+{
+  "apps": [
+    {
+      "name": "welcome",
+      "module": "doc-viewer-hero",
+      "version": "1.0.0",
+      "displayName": "Welcome",
+      "descriptionLong": "Welcome to the EIAP Developer Portal Viewing Tool",
+      "route": "welcome",
+      "color": "blue",
+      "options": {
+        "document": "welcome",
+        "displayChapterNav": false,
+        "hero": {
+          "displayName": "E-UI SDK",
+          "subtitle": "E-UI SDK is a complete Software Development Kit (SDK) for building web-based User Interfaces for Ericsson applications"
+        }
+      }
+    },
+    {
+      "name": "overview",
+      "module": "doc-viewer",
+      "version": "1.0.0",
+      "displayName": "Overview",
+      "descriptionLong": "Overview",
+      "route": "overview",
+      "options": {
+        "document": "overview",
+        "displayChapterNav": false
+      }
+    },
+    {
+      "name": "about-the-service",
+      "module": "doc-viewer",
+      "version": "1.0.0",
+      "displayName": "About This Service",
+      "descriptionLong": "About the App Onboarding Service",
+      "route": "about-the-service",
+      "options": {
+        "document": "about-the-service",
+        "displayChapterNav": true
+      }
+    },
+    {
+      "name": "concepts",
+      "module": "doc-viewer",
+      "version": "1.0.0",
+      "displayName": "Concepts",
+      "descriptionLong": "Concepts",
+      "route": "concepts",
+      "options": {
+        "document": "concepts",
+        "displayChapterNav": true
+      }
+    },
+    {
+      "name": "developer-guide",
+      "module": "doc-viewer",
+      "version": "1.0.0",
+      "displayName": "Developer Documentation",
+      "descriptionLong": "Developer Documentation",
+      "options": {
+        "document": "developer-guide",
+        "displayChapterNav": true
+      },
+      "childNames": [
+        "use-cases",
+        "create-csar"
+      ]
+    },
+    {
+      "name": "use-cases",
+      "module": "doc-viewer",
+      "version": "1.0.0",
+      "displayName": "Use Cases",
+      "descriptionLong": "Use Cases",
+      "route": "developer-guide-use-cases",
+      "options": {
+        "document": "developer-guide-use-cases",
+        "displayChapterNav": true
+      }
+    },
+    {
+      "name": "create-csar",
+      "module": "doc-viewer",
+      "version": "1.0.0",
+      "displayName": "Create a CSAR App Package",
+      "descriptionLong": "Create a CSAR App Package",
+      "route": "developer-guide-create-csar",
+      "options": {
+        "document": "developer-guide-create-csar",
+        "displayChapterNav": true
+      }
+    },
+    {
+      "name": "api-guide",
+      "module": "doc-viewer",
+      "version": "1.0.0",
+      "displayName": "API Guide",
+      "descriptionLong": "API Guide",
+      "route": "api-guide",
+      "options": {
+        "document": "api-guide",
+        "displayChapterNav": true
+      }
+    }
+  ]
+}

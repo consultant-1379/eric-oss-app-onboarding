@@ -1,0 +1,57 @@
+#
+# COPYRIGHT Ericsson 2022
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+
+#Service Name, title of your service, used in navigation menus, e.g. Flow Automation.
+serviceName: "App Onboarding"
+#The current status of your service e.g: beta, stable, deprecated.
+serviceStatus: "stable"
+#Platform service docs is divided into 4 categories. List your pages under the relevant category.
+#If a category is not required leave it empty, and it will not be displayed.
+category:
+  aboutTheService:
+    #List the pages in the order you want them to be displayed
+    - files:
+        #The name of the file for the page
+        - fileName: about-the-service.md
+          #The name that will be displayed
+          displayName: "What is 'App Onboarding'"
+          #Describe the page content, shown when the page link is hovered over
+          previewDescription: "Description for What is 'App Onboarding'"
+  concepts:
+    #List the pages in the order you want them to be displayed
+    - files:
+        - fileName: concepts.md
+          displayName: "App Onboarding Concepts"
+          previewDescription: "Description for App Onboarding Concepts"
+  developerDocumentation:
+    #If pages are to be grouped into different categories, then populate the subCategory.
+    #If subCategory is used, a value must be provided e.g. Developer Guides.
+    - files:
+        #The name of the file for the page
+        - fileName: developer-guide-use-cases.md
+          #The name that will be displayed
+          displayName: "Developer Guide - Use Cases"
+          #Describe the page content, shown when the page link is hovered over
+          previewDescription: "Developer Guide - Use Cases"
+        - fileName: developer-guide-create-csar.md
+          displayName: "Developer Guide - Create a CSAR App Package"
+          previewDescription: "Developer Guide - Create a CSAR App Package"
+  apiDocumentation:
+    #List the pages in the order you want them to be displayed
+    - files:
+        - fileName: api-guide.md
+          displayName: "App Onboarding API"
+          previewDescription: "Description for App Onboarding API"
